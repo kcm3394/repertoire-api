@@ -5,10 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.AppUser;
-import personal.kcm3394.repertoireapi.domain.AppUserDTO;
+import personal.kcm3394.repertoireapi.domain.dtos.AppUserDTO;
 import personal.kcm3394.repertoireapi.domain.CreateUserRequest;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 
+/**
+ * Handles user requests for creating a new user and ensuring password requirements are met.
+ * Ensures password is securely stored in the database by using BCryptPasswordEncoder.
+ */
 @RestController //@Controller + @ResponseBody
 @RequestMapping("/api/user")
 public class AppUserController {

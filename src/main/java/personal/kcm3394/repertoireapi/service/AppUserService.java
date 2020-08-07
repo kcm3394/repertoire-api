@@ -5,6 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 import personal.kcm3394.repertoireapi.domain.AppUser;
 import personal.kcm3394.repertoireapi.repository.AppUserRepository;
 
+/**
+ * Makes calls to the database layer related to CRUD operations for AppUsers
+ */
 @Service
 @Transactional
 public class AppUserService {

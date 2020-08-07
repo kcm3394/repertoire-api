@@ -1,5 +1,6 @@
-package personal.kcm3394.repertoireapi.domain;
+package personal.kcm3394.repertoireapi.domain.dtos;
 
+import personal.kcm3394.repertoireapi.domain.Repertoire;
 import personal.kcm3394.repertoireapi.domain.enums.Fach;
 
 public class AppUserDTO {
