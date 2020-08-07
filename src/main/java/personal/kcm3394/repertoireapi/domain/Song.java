@@ -1,7 +1,9 @@
 package personal.kcm3394.repertoireapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import org.hibernate.annotations.Nationalized;
+import personal.kcm3394.repertoireapi.domain.enums.Language;
 import personal.kcm3394.repertoireapi.domain.enums.Status;
 import personal.kcm3394.repertoireapi.domain.enums.Type;
 
@@ -23,11 +25,14 @@ public class Song {
                 joinColumns = @JoinColumn(name = "composer_id"),
                 inverseJoinColumns = @JoinColumn(name = "song_id"))
     @NotNull
+    @JsonIgnoreProperties("compositions")
     private Composer composer;
 
     private String containingWork;
     private String duration;
-    private String language;
+
+    @Enumerated(EnumType.STRING)
+    private Language language;
 
     @Enumerated(EnumType.STRING)
     private Type type;
@@ -83,11 +88,11 @@ public class Song {
         this.duration = duration;
     }
 
-    public String getLanguage() {
+    public Language getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(Language language) {
         this.language = language;
     }
 

@@ -1,5 +1,6 @@
 package personal.kcm3394.repertoireapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import org.hibernate.annotations.Nationalized;
 import personal.kcm3394.repertoireapi.domain.enums.Epoch;
@@ -29,6 +30,7 @@ public class Composer {
             mappedBy = "composer",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
+    @JsonIgnoreProperties("composer")
     private List<Song> compositions;
 
     public Composer() {
