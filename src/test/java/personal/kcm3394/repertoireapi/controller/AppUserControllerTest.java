@@ -163,7 +163,6 @@ public class AppUserControllerTest {
         doveSono.setDuration("5 minutes");
         doveSono.setLanguage(Language.ITALIAN);
         doveSono.setType(Type.ARIA);
-        doveSono.setStatus(Status.PERFORMED);
 
         List<Song> compositions = new ArrayList<>();
         compositions.add(doveSono);

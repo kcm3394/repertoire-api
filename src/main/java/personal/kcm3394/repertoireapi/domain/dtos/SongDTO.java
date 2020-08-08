@@ -1,44 +1,19 @@
-package personal.kcm3394.repertoireapi.domain;
+package personal.kcm3394.repertoireapi.domain.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.istack.NotNull;
-import org.hibernate.annotations.Nationalized;
+import personal.kcm3394.repertoireapi.domain.Composer;
 import personal.kcm3394.repertoireapi.domain.enums.Language;
 import personal.kcm3394.repertoireapi.domain.enums.Status;
 import personal.kcm3394.repertoireapi.domain.enums.Type;
 
-import javax.persistence.*;
+public class SongDTO {
 
-@Entity
-public class Song {
-
-    @Id
-    @GeneratedValue
     private Long id;
-
-    @Nationalized
-    @NotNull
     private String title;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(name = "composer_song",
-                joinColumns = @JoinColumn(name = "composer_id"),
-                inverseJoinColumns = @JoinColumn(name = "song_id"))
-    @NotNull
-    @JsonIgnoreProperties("compositions")
     private Composer composer;
-
     private String containingWork;
     private String duration;
-
-    @Enumerated(EnumType.STRING)
     private Language language;
-
-    @Enumerated(EnumType.STRING)
     private Type type;
-
-    public Song() {
-    }
 
     public Long getId() {
         return id;
