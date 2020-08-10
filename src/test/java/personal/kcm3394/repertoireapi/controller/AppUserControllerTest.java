@@ -112,9 +112,9 @@ public class AppUserControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.username").value("testUser"))
                 .andExpect(jsonPath("$.fach").value("SOPRANO"))
-                .andExpect(jsonPath("$.repertoire.id").value(1))
-                .andExpect(jsonPath("$.repertoire.songs[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.repertoire.songs[0].composer.name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.repertoire[0].id").value(1))
+                .andExpect(jsonPath("$.repertoire[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.repertoire[0].composer.name").value("Wolfgang Amadeus Mozart"));
     }
 
     @Test
