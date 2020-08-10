@@ -8,12 +8,13 @@ import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Composer {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Nationalized
@@ -31,7 +32,7 @@ public class Composer {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JsonIgnoreProperties("composer")
-    private List<Song> compositions;
+    private Set<Song> compositions;
 
     public Composer() {
     }
@@ -76,11 +77,11 @@ public class Composer {
         this.epoch = epoch;
     }
 
-    public List<Song> getCompositions() {
+    public Set<Song> getCompositions() {
         return compositions;
     }
 
-    public void setCompositions(List<Song> compositions) {
+    public void setCompositions(Set<Song> compositions) {
         this.compositions = compositions;
     }
 }

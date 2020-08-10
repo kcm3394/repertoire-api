@@ -4,23 +4,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import org.hibernate.annotations.Nationalized;
 import personal.kcm3394.repertoireapi.domain.enums.Language;
-import personal.kcm3394.repertoireapi.domain.enums.Status;
 import personal.kcm3394.repertoireapi.domain.enums.Type;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Song {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Nationalized
     @NotNull
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinTable(name = "composer_song",
                 joinColumns = @JoinColumn(name = "composer_id"),
                 inverseJoinColumns = @JoinColumn(name = "song_id"))

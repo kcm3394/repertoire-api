@@ -5,6 +5,7 @@ import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public class ComposerDTO {
 
@@ -13,7 +14,7 @@ public class ComposerDTO {
     private LocalDate birthDate;
     private LocalDate deathDate;
     private Epoch epoch;
-    private List<Song> compositions;
+    private Set<Song> compositions;
 
     public Long getId() {
         return id;
@@ -55,11 +56,11 @@ public class ComposerDTO {
         this.epoch = epoch;
     }
 
-    public List<Song> getCompositions() {
+    public Set<Song> getCompositions() {
         return compositions;
     }
 
-    public void setCompositions(List<Song> compositions) {
+    public void setCompositions(Set<Song> compositions) {
         this.compositions = compositions;
     }
 }

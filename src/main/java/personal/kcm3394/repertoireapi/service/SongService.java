@@ -35,4 +35,8 @@ public class SongService {
     public void deleteSong(Long songId) {
         songRepository.deleteById(songId);
     }
+
+    public List<Song> findAllSongsInUserRepertoire(Long userId) {
+        return songRepository.findAllByAppUser_Id(userId);
+    }
 }

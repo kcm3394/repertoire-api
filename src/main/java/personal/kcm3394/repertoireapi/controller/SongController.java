@@ -2,9 +2,11 @@ package personal.kcm3394.repertoireapi.controller;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Song;
 import personal.kcm3394.repertoireapi.domain.dtos.SongDTO;
+import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.ComposerService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
@@ -21,7 +23,8 @@ public class SongController {
     private final SongService songService;
     private final ComposerService composerService;
 
-    public SongController(SongService songService, ComposerService composerService) {
+    public SongController(SongService songService,
+                          ComposerService composerService) {
         this.songService = songService;
         this.composerService = composerService;
     }

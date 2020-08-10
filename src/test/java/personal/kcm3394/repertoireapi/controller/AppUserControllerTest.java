@@ -1,6 +1,5 @@
 package personal.kcm3394.repertoireapi.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +10,21 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import personal.kcm3394.repertoireapi.domain.*;
-import personal.kcm3394.repertoireapi.domain.enums.*;
+import personal.kcm3394.repertoireapi.domain.AppUser;
+import personal.kcm3394.repertoireapi.domain.Composer;
+import personal.kcm3394.repertoireapi.domain.CreateUserRequest;
+import personal.kcm3394.repertoireapi.domain.Song;
+import personal.kcm3394.repertoireapi.domain.enums.Epoch;
+import personal.kcm3394.repertoireapi.domain.enums.Fach;
+import personal.kcm3394.repertoireapi.domain.enums.Language;
+import personal.kcm3394.repertoireapi.domain.enums.Type;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -147,7 +154,7 @@ public class AppUserControllerTest {
         return appUser;
     }
 
-    private Repertoire getRepertoire() {
+    private Set<Song> getRepertoire() {
         Composer mozart = new Composer();
         mozart.setId(1L);
         mozart.setName("Wolfgang Amadeus Mozart");
@@ -164,15 +171,16 @@ public class AppUserControllerTest {
         doveSono.setLanguage(Language.ITALIAN);
         doveSono.setType(Type.ARIA);
 
-        List<Song> compositions = new ArrayList<>();
+        Set<Song> compositions = new HashSet<>();
         compositions.add(doveSono);
         mozart.setCompositions(compositions);
 
-        Repertoire repertoire = new Repertoire();
-        repertoire.setId(1L);
-        repertoire.setSongs(compositions);
+        return compositions;
+    }
 
-        return repertoire;
+    private List<Song> getDisplayRepertoire() {
+        Set<Song> repertoire = getRepertoire();
+        return new ArrayList<>(repertoire);
     }
 }
 

@@ -5,13 +5,14 @@ import personal.kcm3394.repertoireapi.domain.enums.Fach;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
 public class AppUser {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -24,9 +25,11 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private Fach fach;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "repertoire_id")
-    private Repertoire repertoire;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "user_song",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "song_id"))
+    private Set<Song> repertoire;
 
     public AppUser() {
     }
@@ -63,11 +66,11 @@ public class AppUser {
         this.fach = fach;
     }
 
-    public Repertoire getRepertoire() {
+    public Set<Song> getRepertoire() {
         return repertoire;
     }
 
-    public void setRepertoire(Repertoire repertoire) {
+    public void setRepertoire(Set<Song> repertoire) {
         this.repertoire = repertoire;
     }
 }

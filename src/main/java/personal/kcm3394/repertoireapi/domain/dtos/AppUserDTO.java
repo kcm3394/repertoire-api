@@ -1,14 +1,16 @@
 package personal.kcm3394.repertoireapi.domain.dtos;
 
-import personal.kcm3394.repertoireapi.domain.Repertoire;
+import personal.kcm3394.repertoireapi.domain.Song;
 import personal.kcm3394.repertoireapi.domain.enums.Fach;
+
+import java.util.Set;
 
 public class AppUserDTO {
 
     private Long id;
     private String username;
     private Fach fach;
-    private Repertoire repertoire;
+    private Set<SongDTO> repertoire;
 
     public Long getId() {
         return id;
@@ -34,11 +36,11 @@ public class AppUserDTO {
         this.fach = fach;
     }
 
-    public Repertoire getRepertoire() {
+    public Set<SongDTO> getRepertoire() {
         return repertoire;
     }
 
-    public void setRepertoire(Repertoire repertoire) {
+    public void setRepertoire(Set<SongDTO> repertoire) {
         this.repertoire = repertoire;
     }
 }

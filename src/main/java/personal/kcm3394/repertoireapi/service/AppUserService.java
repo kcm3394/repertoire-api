@@ -3,7 +3,10 @@ package personal.kcm3394.repertoireapi.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import personal.kcm3394.repertoireapi.domain.AppUser;
+import personal.kcm3394.repertoireapi.domain.Song;
 import personal.kcm3394.repertoireapi.repository.AppUserRepository;
+
+import java.util.Set;
 
 /**
  * Makes calls to the database layer related to CRUD operations for AppUsers
@@ -22,7 +25,7 @@ public class AppUserService {
         return appUserRepository.findAppUserByUsername(username);
     }
 
-    public AppUser saveUser(AppUser appUser) {
+    public AppUser saveOrUpdateUser(AppUser appUser) {
         return appUserRepository.save(appUser);
     }
 

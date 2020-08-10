@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.AppUser;
-import personal.kcm3394.repertoireapi.domain.dtos.AppUserDTO;
 import personal.kcm3394.repertoireapi.domain.CreateUserRequest;
+import personal.kcm3394.repertoireapi.domain.dtos.AppUserDTO;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 
 /**
@@ -20,7 +20,8 @@ public class AppUserController {
     private final AppUserService appUserService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public AppUserController(AppUserService appUserService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AppUserController(AppUserService appUserService,
+                             BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.appUserService = appUserService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -41,7 +42,7 @@ public class AppUserController {
         appUser.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
         appUser.setFach(createUserRequest.getFach());
 
-        appUserService.saveUser(appUser);
+        appUserService.saveOrUpdateUser(appUser);
         AppUserDTO appUserDTO = covertEntityToAppUserDTO(appUser);
         return ResponseEntity.ok(appUserDTO);
     }
