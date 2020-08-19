@@ -9,7 +9,7 @@ public class SongDTO {
 
     private Long id;
     private String title;
-    private Composer composer;
+    private ComposerDTO composer;
     private String containingWork;
     private String duration;
     private Language language;
@@ -31,11 +31,11 @@ public class SongDTO {
         this.title = title;
     }
 
-    public Composer getComposer() {
+    public ComposerDTO getComposer() {
         return composer;
     }
 
-    public void setComposer(Composer composer) {
+    public void setComposer(ComposerDTO composer) {
         this.composer = composer;
     }
 

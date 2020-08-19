@@ -3,6 +3,7 @@ package personal.kcm3394.repertoireapi.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import personal.kcm3394.repertoireapi.domain.Composer;
+import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 import personal.kcm3394.repertoireapi.repository.ComposerRepository;
 
 import java.util.List;
@@ -34,6 +35,19 @@ public class ComposerService {
 
     public void deleteComposer(Long composerId) {
         composerRepository.deleteById(composerId);
+    }
+
+    public List<Composer> searchComposersByName(String nameFragment) {
+        return composerRepository.findAllByNameContaining(nameFragment);
+    }
+
+    public List<Composer> searchComposersByEpoch(String epoch) {
+        epoch = epoch.toUpperCase();
+        return composerRepository.findAllByEpoch(Epoch.valueOf(epoch));
+    }
+
+    public List<Composer> searchComposersByComposition(String titleFragment) {
+        return composerRepository.findAllByCompositions_TitleContains("%" + titleFragment + "%");
     }
 
 

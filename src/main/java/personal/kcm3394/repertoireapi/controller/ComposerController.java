@@ -48,6 +48,33 @@ public class ComposerController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/search/name/{nameFragment}")
+    public ResponseEntity<List<ComposerDTO>> searchComposersByName(@PathVariable String nameFragment) {
+        List<Composer> composers = composerService.searchComposersByName(nameFragment);
+        List<ComposerDTO> composerDTOs = new ArrayList<>();
+        composers.forEach(composer ->
+                composerDTOs.add(convertEntityToComposerDTO(composer)));
+        return ResponseEntity.ok(composerDTOs);
+    }
+
+    @GetMapping("/search/epoch/{epoch}")
+    public ResponseEntity<List<ComposerDTO>> searchComposersByEpoch(@PathVariable String epoch) {
+        List<Composer> composers = composerService.searchComposersByEpoch(epoch);
+        List<ComposerDTO> composerDTOs = new ArrayList<>();
+        composers.forEach(composer ->
+                composerDTOs.add(convertEntityToComposerDTO(composer)));
+        return ResponseEntity.ok(composerDTOs);
+    }
+
+    @GetMapping("/search/composition/{composition}")
+    public ResponseEntity<List<ComposerDTO>> searchComposersByComposition(@PathVariable String composition) {
+        List<Composer> composers = composerService.searchComposersByComposition(composition);
+        List<ComposerDTO> composerDTOs = new ArrayList<>();
+        composers.forEach(composer ->
+                composerDTOs.add(convertEntityToComposerDTO(composer)));
+        return ResponseEntity.ok(composerDTOs);
+    }
+
     private static ComposerDTO convertEntityToComposerDTO(Composer composer) {
         ComposerDTO composerDTO = new ComposerDTO();
         BeanUtils.copyProperties(composer, composerDTO);

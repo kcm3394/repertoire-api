@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.AppUser;
 import personal.kcm3394.repertoireapi.domain.Song;
+import personal.kcm3394.repertoireapi.domain.dtos.ComposerDTO;
 import personal.kcm3394.repertoireapi.domain.dtos.SongDTO;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.SongService;
@@ -80,6 +81,9 @@ public class RepertoireController {
     private static SongDTO convertEntityToSongDTO(Song song) {
         SongDTO songDTO = new SongDTO();
         BeanUtils.copyProperties(song, songDTO);
+        ComposerDTO composerDTO = new ComposerDTO();
+        BeanUtils.copyProperties(song.getComposer(), composerDTO);
+        songDTO.setComposer(composerDTO);
         return songDTO;
     }
 

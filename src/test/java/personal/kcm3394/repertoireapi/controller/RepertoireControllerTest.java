@@ -12,14 +12,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import personal.kcm3394.repertoireapi.domain.AppUser;
 import personal.kcm3394.repertoireapi.domain.Composer;
 import personal.kcm3394.repertoireapi.domain.Song;
-import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 import personal.kcm3394.repertoireapi.domain.enums.Fach;
 import personal.kcm3394.repertoireapi.domain.enums.Language;
 import personal.kcm3394.repertoireapi.domain.enums.Type;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

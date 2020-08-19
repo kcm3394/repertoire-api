@@ -2,11 +2,10 @@ package personal.kcm3394.repertoireapi.controller;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Song;
+import personal.kcm3394.repertoireapi.domain.dtos.ComposerDTO;
 import personal.kcm3394.repertoireapi.domain.dtos.SongDTO;
-import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.ComposerService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
@@ -58,9 +57,30 @@ public class SongController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/search/title/{titleFragment}")
+    public ResponseEntity<List<SongDTO>> searchSongsByTitle(@PathVariable String titleFragment) {
+        List<Song> songs = songService.searchSongsByTitle(titleFragment);
+        List<SongDTO> songDTOs = new ArrayList<>();
+        songs.forEach(song ->
+                songDTOs.add(convertEntityToSongDTO(song)));
+        return ResponseEntity.ok(songDTOs);
+    }
+
+    @GetMapping("/search/composer/{composerName}")
+    public ResponseEntity<List<SongDTO>> searchSongsByComposer(@PathVariable String composerName) {
+        List<Song> songs = songService.searchSongsByComposer(composerName);
+        List<SongDTO> songDTOs = new ArrayList<>();
+        songs.forEach(song ->
+                songDTOs.add(convertEntityToSongDTO(song)));
+        return ResponseEntity.ok(songDTOs);
+    }
+
     private static SongDTO convertEntityToSongDTO(Song song) {
         SongDTO songDTO = new SongDTO();
         BeanUtils.copyProperties(song, songDTO);
+        ComposerDTO composerDTO = new ComposerDTO();
+        BeanUtils.copyProperties(song.getComposer(), composerDTO);
+        songDTO.setComposer(composerDTO);
         return songDTO;
     }
 

@@ -14,7 +14,6 @@ public class ComposerDTO {
     private LocalDate birthDate;
     private LocalDate deathDate;
     private Epoch epoch;
-    private Set<Song> compositions;
 
     public Long getId() {
         return id;
@@ -54,13 +53,5 @@ public class ComposerDTO {
 
     public void setEpoch(Epoch epoch) {
         this.epoch = epoch;
-    }
-
-    public Set<Song> getCompositions() {
-        return compositions;
-    }
-
-    public void setCompositions(Set<Song> compositions) {
-        this.compositions = compositions;
     }
 }

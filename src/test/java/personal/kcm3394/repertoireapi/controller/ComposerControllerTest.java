@@ -1,6 +1,5 @@
 package personal.kcm3394.repertoireapi.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -88,6 +88,45 @@ public class ComposerControllerTest {
         mockMvc.perform(delete("/api/composer/delete/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnListWithMozartWhenSearchByName() throws Exception {
+        ArrayList<Composer> justMozart = new ArrayList<>();
+        justMozart.add(getComposerMozart());
+        when(composerService.searchComposersByName(anyString())).thenReturn(justMozart);
+
+        mockMvc.perform(get("/api/composer/search/name/moz")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnListWithMozartWhenSearchByEpoch() throws Exception {
+        ArrayList<Composer> justMozart = new ArrayList<>();
+        justMozart.add(getComposerMozart());
+        when(composerService.searchComposersByEpoch(anyString())).thenReturn(justMozart);
+
+        mockMvc.perform(get("/api/composer/search/epoch/classical")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnListWithMozartWhenSearchByComposition() throws Exception {
+        ArrayList<Composer> justMozart = new ArrayList<>();
+        justMozart.add(getComposerMozart());
+        when(composerService.searchComposersByComposition(anyString())).thenReturn(justMozart);
+
+        mockMvc.perform(get("/api/composer/search/composition/dove")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"));
     }
 
     private Composer getComposerMozart() {

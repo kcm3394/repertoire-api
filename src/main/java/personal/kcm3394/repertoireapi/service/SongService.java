@@ -39,4 +39,12 @@ public class SongService {
     public List<Song> findAllSongsInUserRepertoire(Long userId) {
         return songRepository.findAllByAppUser_Id(userId);
     }
+
+    public List<Song> searchSongsByTitle(String titleFragment) {
+        return songRepository.findAllByTitleContaining(titleFragment);
+    }
+
+    public List<Song> searchSongsByComposer(String composerName) {
+        return songRepository.findAllByComposer_NameContains("%" + composerName + "%");
+    }
 }

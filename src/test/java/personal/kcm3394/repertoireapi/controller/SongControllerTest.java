@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -106,6 +107,32 @@ public class SongControllerTest {
                 .content(objectMapper.writeValueAsString(getDoveSono()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnListWithDoveSonoWhenSearchByTitle() throws Exception {
+        ArrayList<Song> justDoveSono = new ArrayList<>();
+        justDoveSono.add(getDoveSono());
+        when(songService.searchSongsByTitle(anyString())).thenReturn(justDoveSono);
+
+        mockMvc.perform(get("/api/song/search/title/sono")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnListWithDoveSonoWhensSearchByComposer() throws Exception {
+        ArrayList<Song> justDoveSono = new ArrayList<>();
+        justDoveSono.add(getDoveSono());
+        when(songService.searchSongsByComposer(anyString())).thenReturn(justDoveSono);
+
+        mockMvc.perform(get("/api/song/search/composer/mozart")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"));
     }
 
     private Composer getMozart() {
