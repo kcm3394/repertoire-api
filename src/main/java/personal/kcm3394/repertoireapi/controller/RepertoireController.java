@@ -86,10 +86,4 @@ public class RepertoireController {
         songDTO.setComposer(composerDTO);
         return songDTO;
     }
-
-    private static Song convertSongDTOToEntity(SongDTO songDTO) {
-        Song song = new Song();
-        BeanUtils.copyProperties(songDTO, song);
-        return song;
-    }
 }
