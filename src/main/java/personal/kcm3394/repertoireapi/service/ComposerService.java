@@ -38,12 +38,12 @@ public class ComposerService {
     }
 
     public List<Composer> searchComposersByName(String nameFragment) {
-        return composerRepository.findAllByNameContaining(nameFragment);
+        return composerRepository.findAllByNameContainingOrderByName(nameFragment);
     }
 
     public List<Composer> searchComposersByEpoch(String epoch) {
         epoch = epoch.toUpperCase();
-        return composerRepository.findAllByEpoch(Epoch.valueOf(epoch));
+        return composerRepository.findAllByEpochOrderByName(Epoch.valueOf(epoch));
     }
 
     public List<Composer> searchComposersByComposition(String titleFragment) {

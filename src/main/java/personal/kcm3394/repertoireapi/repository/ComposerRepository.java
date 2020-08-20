@@ -14,10 +14,10 @@ import java.util.List;
 @Repository
 public interface ComposerRepository extends JpaRepository<Composer, Long> {
 
-    List<Composer> findAllByNameContaining(String nameFragment);
+    List<Composer> findAllByNameContainingOrderByName(String nameFragment);
 
-    List<Composer> findAllByEpoch(Epoch epoch);
+    List<Composer> findAllByEpochOrderByName(Epoch epoch);
 
-    @Query("SELECT c FROM Composer c JOIN c.compositions s WHERE s.title LIKE :pattern")
+    @Query("SELECT c FROM Composer c JOIN c.compositions s WHERE s.title LIKE :pattern ORDER BY c.name ASC")
     List<Composer> findAllByCompositions_TitleContains(String pattern);
 }

@@ -11,10 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import personal.kcm3394.repertoireapi.domain.AppUser;
 import personal.kcm3394.repertoireapi.domain.Composer;
 import personal.kcm3394.repertoireapi.domain.Song;
-import personal.kcm3394.repertoireapi.domain.enums.Fach;
-import personal.kcm3394.repertoireapi.domain.enums.Language;
-import personal.kcm3394.repertoireapi.domain.enums.Type;
+import personal.kcm3394.repertoireapi.domain.enums.*;
 import personal.kcm3394.repertoireapi.service.AppUserService;
+import personal.kcm3394.repertoireapi.service.ComposerService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,6 +41,9 @@ public class RepertoireControllerTest {
     @MockBean
     private AppUserService appUserService;
 
+    @MockBean
+    private ComposerService composerService;
+
     @Test
     @WithMockUser
     void shouldReturnUserRepertoire() throws Exception {
@@ -48,6 +51,75 @@ public class RepertoireControllerTest {
         when(songService.findAllSongsInUserRepertoire(any())).thenReturn(getDisplayRepertoire());
 
         mockMvc.perform(get("/api/repertoire")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnUserRepertoireByStatus() throws Exception {
+        when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
+        when(songService.findAllSongsInUserRepertoireByStatus(anyLong(), any(Status.class))).thenReturn(getDisplayRepertoire());
+
+        mockMvc.perform(get("/api/repertoire/byStatus/PERFORMED")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnUserRepertoireByLanguage() throws Exception {
+        when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
+        when(songService.findAllSongsInUserRepertoireByLanguage(anyLong(), any(Language.class))).thenReturn(getDisplayRepertoire());
+
+        mockMvc.perform(get("/api/repertoire/byLanguage/ITALIAN")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnUserRepertoireByComposer() throws Exception {
+        when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
+        when(composerService.findComposerById(anyLong())).thenReturn(getMozart());
+        when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong())).thenReturn(getDisplayRepertoire());
+
+        mockMvc.perform(get("/api/repertoire/byComposer/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnNotFoundWhenComposerIdDoesNotExist() throws Exception {
+        when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
+        when(composerService.findComposerById(anyLong())).thenReturn(null);
+        when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong())).thenReturn(getDisplayRepertoire());
+
+        mockMvc.perform(get("/api/repertoire/byComposer/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void shouldReturnUserRepertoireByEpoch() throws Exception {
+        when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
+        when(songService.findAllSongsInUserRepertoireByEpoch(anyLong(), any(Epoch.class))).thenReturn(getDisplayRepertoire());
+
+        mockMvc.perform(get("/api/repertoire/byEpoch/CLASSICAL")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id").value(1))
@@ -152,6 +224,14 @@ public class RepertoireControllerTest {
         nessun.setType(Type.ARIA);
 
         return nessun;
+    }
+
+    private Composer getMozart() {
+        Composer mozart = new Composer();
+        mozart.setId(1L);
+        mozart.setName("Wolfgang Amadeus Mozart");
+
+        return mozart;
     }
 
 

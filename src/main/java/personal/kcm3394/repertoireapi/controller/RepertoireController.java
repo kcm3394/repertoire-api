@@ -5,10 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.AppUser;
+import personal.kcm3394.repertoireapi.domain.Composer;
 import personal.kcm3394.repertoireapi.domain.Song;
 import personal.kcm3394.repertoireapi.domain.dtos.ComposerDTO;
 import personal.kcm3394.repertoireapi.domain.dtos.SongDTO;
+import personal.kcm3394.repertoireapi.domain.enums.Epoch;
+import personal.kcm3394.repertoireapi.domain.enums.Language;
+import personal.kcm3394.repertoireapi.domain.enums.Status;
 import personal.kcm3394.repertoireapi.service.AppUserService;
+import personal.kcm3394.repertoireapi.service.ComposerService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
@@ -24,10 +29,14 @@ public class RepertoireController {
 
     private final SongService songService;
     private final AppUserService appUserService;
+    private final ComposerService composerService;
 
-    public RepertoireController(SongService songService, AppUserService appUserService) {
+    public RepertoireController(SongService songService,
+                                AppUserService appUserService,
+                                ComposerService composerService) {
         this.songService = songService;
         this.appUserService = appUserService;
+        this.composerService = composerService;
     }
 
     @GetMapping
@@ -36,6 +45,51 @@ public class RepertoireController {
         List<Song> repertoire = songService.findAllSongsInUserRepertoire(userId);
         List<SongDTO> songDTOs = new ArrayList<>();
         repertoire.forEach(song ->
+                songDTOs.add(convertEntityToSongDTO(song)));
+        return ResponseEntity.ok(songDTOs);
+    }
+
+    @GetMapping("/byStatus/{status}")
+    public ResponseEntity<List<SongDTO>> getRepertoireListByStatus(Authentication auth, @PathVariable Status status) {
+        Long userId = appUserService.findUserByUsername(auth.getName()).getId();
+        List<Song> repertoireByStatus = songService.findAllSongsInUserRepertoireByStatus(userId, status);
+        List<SongDTO> songDTOs = new ArrayList<>();
+        repertoireByStatus.forEach(song ->
+                songDTOs.add(convertEntityToSongDTO(song)));
+        return ResponseEntity.ok(songDTOs);
+    }
+
+    @GetMapping("/byLanguage/{language}")
+    public ResponseEntity<List<SongDTO>> getRepertoireListByLanguage(Authentication auth, @PathVariable Language language) {
+        Long userId = appUserService.findUserByUsername(auth.getName()).getId();
+        List<Song> repertoireByLanguage = songService.findAllSongsInUserRepertoireByLanguage(userId, language);
+        List<SongDTO> songDTOs = new ArrayList<>();
+        repertoireByLanguage.forEach(song ->
+                songDTOs.add(convertEntityToSongDTO(song)));
+        return ResponseEntity.ok(songDTOs);
+    }
+
+    @GetMapping("/byComposer/{composerId}")
+    public ResponseEntity<List<SongDTO>> getRepertoireListByComposer(Authentication auth, @PathVariable Long composerId) {
+        Long userId = appUserService.findUserByUsername(auth.getName()).getId();
+        Composer composer = composerService.findComposerById(composerId);
+        if (composer == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<Song> repertoireByComposer = songService.findAllSongsInUserRepertoireByComposer(userId, composerId);
+        List<SongDTO> songDTOs = new ArrayList<>();
+        repertoireByComposer.forEach(song ->
+                songDTOs.add(convertEntityToSongDTO(song)));
+        return ResponseEntity.ok(songDTOs);
+    }
+
+    @GetMapping("/byEpoch/{epoch}")
+    public ResponseEntity<List<SongDTO>> getRepertoireListByEpoch(Authentication auth, @PathVariable Epoch epoch) {
+        Long userId = appUserService.findUserByUsername(auth.getName()).getId();
+        List<Song> repertoireByEpoch = songService.findAllSongsInUserRepertoireByEpoch(userId, epoch);
+        List<SongDTO> songDTOs = new ArrayList<>();
+        repertoireByEpoch.forEach(song ->
                 songDTOs.add(convertEntityToSongDTO(song)));
         return ResponseEntity.ok(songDTOs);
     }
