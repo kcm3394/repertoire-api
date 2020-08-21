@@ -1,6 +1,9 @@
 package personal.kcm3394.repertoireapi.controller;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Song;
@@ -29,12 +32,9 @@ public class SongController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SongDTO>> listAllSongs() {
-        List<Song> songs = songService.getAllSongs();
-        List<SongDTO> songDTOs = new ArrayList<>();
-        songs.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+    public ResponseEntity<Page<SongDTO>> listAllSongs(Pageable pageable) {
+        Page<Song> songs = songService.getAllSongs(pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(songs, pageable));
     }
 
     @PostMapping("/add")
@@ -58,21 +58,22 @@ public class SongController {
     }
 
     @GetMapping("/search/title/{titleFragment}")
-    public ResponseEntity<List<SongDTO>> searchSongsByTitle(@PathVariable String titleFragment) {
-        List<Song> songs = songService.searchSongsByTitle(titleFragment);
-        List<SongDTO> songDTOs = new ArrayList<>();
-        songs.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+    public ResponseEntity<Page<SongDTO>> searchSongsByTitle(@PathVariable String titleFragment, Pageable pageable) {
+        Page<Song> songs = songService.searchSongsByTitle(titleFragment, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(songs, pageable));
     }
 
     @GetMapping("/search/composer/{composerName}")
-    public ResponseEntity<List<SongDTO>> searchSongsByComposer(@PathVariable String composerName) {
-        List<Song> songs = songService.searchSongsByComposer(composerName);
+    public ResponseEntity<Page<SongDTO>> searchSongsByComposer(@PathVariable String composerName, Pageable pageable) {
+        Page<Song> songs = songService.searchSongsByComposer(composerName, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(songs, pageable));
+    }
+
+    private static PageImpl<SongDTO> convertPageOfEntitiesToPageImplOfSongDTOs(Page<Song> songs, Pageable pageable) {
         List<SongDTO> songDTOs = new ArrayList<>();
         songs.forEach(song ->
                 songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+        return new PageImpl<>(songDTOs, pageable, songs.getTotalElements());
     }
 
     private static SongDTO convertEntityToSongDTO(Song song) {

@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,13 +49,15 @@ public class SongControllerTest {
     @Test
     @WithMockUser
     void shouldReturnListOfSongs() throws Exception {
-        when(songService.getAllSongs()).thenReturn(getAllSongs());
+        Pageable pageable = PageRequest.of(0, 5);
+        when(songService.getAllSongs(any(Pageable.class))).thenReturn(getAllSongs(pageable));
 
         mockMvc.perform(get("/api/song")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.[1].title").value("Nessun dorma"));
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.content[1].title").value("Nessun dorma"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
@@ -112,27 +118,33 @@ public class SongControllerTest {
     @Test
     @WithMockUser
     void shouldReturnListWithDoveSonoWhenSearchByTitle() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Song> justDoveSono = new ArrayList<>();
         justDoveSono.add(getDoveSono());
-        when(songService.searchSongsByTitle(anyString())).thenReturn(justDoveSono);
+        PageImpl<Song> justDovePage = new PageImpl<>(justDoveSono, pageable, justDoveSono.size());
+        when(songService.searchSongsByTitle(anyString(), any(Pageable.class))).thenReturn(justDovePage);
 
         mockMvc.perform(get("/api/song/search/title/sono")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"));
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnListWithDoveSonoWhensSearchByComposer() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Song> justDoveSono = new ArrayList<>();
         justDoveSono.add(getDoveSono());
-        when(songService.searchSongsByComposer(anyString())).thenReturn(justDoveSono);
+        PageImpl<Song> justDovePage = new PageImpl<>(justDoveSono, pageable, justDoveSono.size());
+        when(songService.searchSongsByComposer(anyString(), any(Pageable.class))).thenReturn(justDovePage);
 
         mockMvc.perform(get("/api/song/search/composer/mozart")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"));
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     private Composer getMozart() {
@@ -175,13 +187,13 @@ public class SongControllerTest {
         return nessun;
     }
 
-    private List<Song> getAllSongs() {
+    private Page<Song> getAllSongs(Pageable pageable) {
         Song doveSono = getDoveSono();
         Song nessun = getNessunDorma();
         List<Song> songs = new ArrayList<>();
         songs.add(doveSono);
         songs.add(nessun);
 
-        return songs;
+        return new PageImpl<>(songs, pageable, songs.size());
     }
 }

@@ -1,6 +1,9 @@
 package personal.kcm3394.repertoireapi.controller;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Composer;
@@ -24,12 +27,9 @@ public class ComposerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ComposerDTO>> listAllComposers() {
-        List<Composer> composers = composerService.getAllComposers();
-        List<ComposerDTO> composerDTOs = new ArrayList<>();
-        composers.forEach(composer ->
-                composerDTOs.add(convertEntityToComposerDTO(composer)));
-        return ResponseEntity.ok(composerDTOs);
+    public ResponseEntity<Page<ComposerDTO>> listAllComposers(Pageable pageable) {
+        Page<Composer> composers = composerService.getAllComposers(pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfCompDTOs(composers, pageable));
     }
 
     @PostMapping("/add")
@@ -49,30 +49,28 @@ public class ComposerController {
     }
 
     @GetMapping("/search/name/{nameFragment}")
-    public ResponseEntity<List<ComposerDTO>> searchComposersByName(@PathVariable String nameFragment) {
-        List<Composer> composers = composerService.searchComposersByName(nameFragment);
-        List<ComposerDTO> composerDTOs = new ArrayList<>();
-        composers.forEach(composer ->
-                composerDTOs.add(convertEntityToComposerDTO(composer)));
-        return ResponseEntity.ok(composerDTOs);
+    public ResponseEntity<Page<ComposerDTO>> searchComposersByName(@PathVariable String nameFragment, Pageable pageable) {
+        Page<Composer> composers = composerService.searchComposersByName(nameFragment, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfCompDTOs(composers, pageable));
     }
 
     @GetMapping("/search/epoch/{epoch}")
-    public ResponseEntity<List<ComposerDTO>> searchComposersByEpoch(@PathVariable String epoch) {
-        List<Composer> composers = composerService.searchComposersByEpoch(epoch);
-        List<ComposerDTO> composerDTOs = new ArrayList<>();
-        composers.forEach(composer ->
-                composerDTOs.add(convertEntityToComposerDTO(composer)));
-        return ResponseEntity.ok(composerDTOs);
+    public ResponseEntity<Page<ComposerDTO>> searchComposersByEpoch(@PathVariable String epoch, Pageable pageable) {
+        Page<Composer> composers = composerService.searchComposersByEpoch(epoch, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfCompDTOs(composers, pageable));
     }
 
     @GetMapping("/search/composition/{composition}")
-    public ResponseEntity<List<ComposerDTO>> searchComposersByComposition(@PathVariable String composition) {
-        List<Composer> composers = composerService.searchComposersByComposition(composition);
+    public ResponseEntity<Page<ComposerDTO>> searchComposersByComposition(@PathVariable String composition, Pageable pageable) {
+        Page<Composer> composers = composerService.searchComposersByComposition(composition, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfCompDTOs(composers, pageable));
+    }
+
+    private static PageImpl<ComposerDTO> convertPageOfEntitiesToPageImplOfCompDTOs(Page<Composer> composers, Pageable pageable) {
         List<ComposerDTO> composerDTOs = new ArrayList<>();
         composers.forEach(composer ->
                 composerDTOs.add(convertEntityToComposerDTO(composer)));
-        return ResponseEntity.ok(composerDTOs);
+        return new PageImpl<>(composerDTOs, pageable, composers.getTotalElements());
     }
 
     private static ComposerDTO convertEntityToComposerDTO(Composer composer) {

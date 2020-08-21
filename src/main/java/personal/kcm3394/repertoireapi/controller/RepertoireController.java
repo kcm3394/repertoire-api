@@ -1,6 +1,9 @@
 package personal.kcm3394.repertoireapi.controller;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -40,58 +43,43 @@ public class RepertoireController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SongDTO>> getRepertoireList(Authentication auth) {
+    public ResponseEntity<Page<SongDTO>> getRepertoireList(Authentication auth, Pageable pageable) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
-        List<Song> repertoire = songService.findAllSongsInUserRepertoire(userId);
-        List<SongDTO> songDTOs = new ArrayList<>();
-        repertoire.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+        Page<Song> repertoire = songService.findAllSongsInUserRepertoire(userId, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(repertoire, pageable));
     }
 
     @GetMapping("/byStatus/{status}")
-    public ResponseEntity<List<SongDTO>> getRepertoireListByStatus(Authentication auth, @PathVariable Status status) {
+    public ResponseEntity<Page<SongDTO>> getRepertoireListByStatus(Authentication auth, @PathVariable Status status, Pageable pageable) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
-        List<Song> repertoireByStatus = songService.findAllSongsInUserRepertoireByStatus(userId, status);
-        List<SongDTO> songDTOs = new ArrayList<>();
-        repertoireByStatus.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+        Page<Song> repertoireByStatus = songService.findAllSongsInUserRepertoireByStatus(userId, status, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(repertoireByStatus, pageable));
     }
 
     @GetMapping("/byLanguage/{language}")
-    public ResponseEntity<List<SongDTO>> getRepertoireListByLanguage(Authentication auth, @PathVariable Language language) {
+    public ResponseEntity<Page<SongDTO>> getRepertoireListByLanguage(Authentication auth, @PathVariable Language language, Pageable pageable) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
-        List<Song> repertoireByLanguage = songService.findAllSongsInUserRepertoireByLanguage(userId, language);
-        List<SongDTO> songDTOs = new ArrayList<>();
-        repertoireByLanguage.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+        Page<Song> repertoireByLanguage = songService.findAllSongsInUserRepertoireByLanguage(userId, language, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(repertoireByLanguage, pageable));
     }
 
     @GetMapping("/byComposer/{composerId}")
-    public ResponseEntity<List<SongDTO>> getRepertoireListByComposer(Authentication auth, @PathVariable Long composerId) {
+    public ResponseEntity<Page<SongDTO>> getRepertoireListByComposer(Authentication auth, @PathVariable Long composerId, Pageable pageable) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
         Composer composer = composerService.findComposerById(composerId);
         if (composer == null) {
             return ResponseEntity.notFound().build();
         }
 
-        List<Song> repertoireByComposer = songService.findAllSongsInUserRepertoireByComposer(userId, composerId);
-        List<SongDTO> songDTOs = new ArrayList<>();
-        repertoireByComposer.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+        Page<Song> repertoireByComposer = songService.findAllSongsInUserRepertoireByComposer(userId, composerId, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(repertoireByComposer, pageable));
     }
 
     @GetMapping("/byEpoch/{epoch}")
-    public ResponseEntity<List<SongDTO>> getRepertoireListByEpoch(Authentication auth, @PathVariable Epoch epoch) {
+    public ResponseEntity<Page<SongDTO>> getRepertoireListByEpoch(Authentication auth, @PathVariable Epoch epoch, Pageable pageable) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
-        List<Song> repertoireByEpoch = songService.findAllSongsInUserRepertoireByEpoch(userId, epoch);
-        List<SongDTO> songDTOs = new ArrayList<>();
-        repertoireByEpoch.forEach(song ->
-                songDTOs.add(convertEntityToSongDTO(song)));
-        return ResponseEntity.ok(songDTOs);
+        Page<Song> repertoireByEpoch = songService.findAllSongsInUserRepertoireByEpoch(userId, epoch, pageable);
+        return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfSongDTOs(repertoireByEpoch, pageable));
     }
 
     @PostMapping("/add/{id}")
@@ -130,6 +118,14 @@ public class RepertoireController {
         appUser.setRepertoire(repertoire);
         appUserService.saveOrUpdateUser(appUser);
         return ResponseEntity.ok().build();
+    }
+
+    private static PageImpl<SongDTO> convertPageOfEntitiesToPageImplOfSongDTOs(Page<Song> songs, Pageable pageable) {
+        List<SongDTO> songDTOs = new ArrayList<>();
+        for (Song song : songs) {
+            songDTOs.add(convertEntityToSongDTO(song));
+        }
+        return new PageImpl<>(songDTOs, pageable, songs.getTotalElements());
     }
 
     private static SongDTO convertEntityToSongDTO(Song song) {

@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,14 +43,16 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListOfComposers() throws Exception {
-        when(composerService.getAllComposers()).thenReturn(getAllComposers());
+    void shouldReturnPageOfComposers() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
+        when(composerService.getAllComposers(any(Pageable.class))).thenReturn(getAllComposers(pageable));
 
         mockMvc.perform(get("/api/composer")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"))
-                .andExpect(jsonPath("$.[1].name").value("Giacomo Puccini"));
+                .andExpect(jsonPath("$.content[0].name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.content[1].name").value("Giacomo Puccini"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
@@ -92,41 +98,50 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListWithMozartWhenSearchByName() throws Exception {
+    void shouldReturnPageWithMozartWhenSearchByName() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(getComposerMozart());
-        when(composerService.searchComposersByName(anyString())).thenReturn(justMozart);
+        PageImpl<Composer> justMozartPage = new PageImpl<>(justMozart, pageable, justMozart.size());
+        when(composerService.searchComposersByName(anyString(), any(Pageable.class))).thenReturn(justMozartPage);
 
         mockMvc.perform(get("/api/composer/search/name/moz")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnListWithMozartWhenSearchByEpoch() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(getComposerMozart());
-        when(composerService.searchComposersByEpoch(anyString())).thenReturn(justMozart);
+        PageImpl<Composer> justMozartPage = new PageImpl<>(justMozart, pageable, justMozart.size());
+        when(composerService.searchComposersByEpoch(anyString(), any(Pageable.class))).thenReturn(justMozartPage);
 
         mockMvc.perform(get("/api/composer/search/epoch/classical")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnListWithMozartWhenSearchByComposition() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(getComposerMozart());
-        when(composerService.searchComposersByComposition(anyString())).thenReturn(justMozart);
+        PageImpl<Composer> justMozartPage = new PageImpl<>(justMozart, pageable, justMozart.size());
+        when(composerService.searchComposersByComposition(anyString(), any(Pageable.class))).thenReturn(justMozartPage);
 
         mockMvc.perform(get("/api/composer/search/composition/dove")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     private Composer getComposerMozart() {
@@ -151,13 +166,13 @@ public class ComposerControllerTest {
         return puccini;
     }
 
-    private List<Composer> getAllComposers() {
+    private Page<Composer> getAllComposers(Pageable pageable) {
         Composer mozart = getComposerMozart();
         Composer puccini = getComposerPuccini();
         List<Composer> composers = new ArrayList<>();
         composers.add(mozart);
         composers.add(puccini);
 
-        return composers;
+        return new PageImpl<>(composers, pageable, composers.size());
     }
 }

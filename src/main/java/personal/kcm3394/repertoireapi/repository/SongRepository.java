@@ -1,15 +1,14 @@
 package personal.kcm3394.repertoireapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import personal.kcm3394.repertoireapi.domain.Song;
 import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 import personal.kcm3394.repertoireapi.domain.enums.Language;
 import personal.kcm3394.repertoireapi.domain.enums.Status;
-
-import java.util.List;
 
 /**
  * Database connection layer for CRUD operations on Songs
@@ -17,27 +16,29 @@ import java.util.List;
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {
 
-    @Query("SELECT s, u FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId ORDER BY s.title ASC")
-    List<Song> findAllSongsInRepertoireByAppUser_Id(Long userId);
+    @Query("SELECT s FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId")
+    Page<Song> findAllSongsInRepertoireByAppUser_Id(Long userId, Pageable pageable);
 
-    List<Song> findAllByTitleContainingOrderByTitle(String titleFragment);
+    Page<Song> findAllByTitleContainingOrderByTitle(String titleFragment, Pageable pageable);
 
     @Query("SELECT s FROM Song s JOIN s.composer c WHERE c.name LIKE :pattern ORDER BY s.title ASC")
-    List<Song> findAllByComposer_NameContains(String pattern);
+    Page<Song> findAllByComposer_NameContains(String pattern, Pageable pageable);
 
-    @Query("SELECT s, n FROM Notes n JOIN n.song s WHERE n.user.id = :userId AND n.status = :status")
-    List<Song> findAllSongsInRepertoireByUserWithStatus(Long userId, Status status);
+    @Query("SELECT s FROM Notes n JOIN n.song s WHERE n.user.id = :userId AND n.status = :status")
+    Page<Song> findAllSongsInRepertoireByUserWithStatus(Long userId, Status status, Pageable pageable);
 
-    @Query("SELECT s, u FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId AND s.language = :language")
-    List<Song> findAllSongsInRepertoireByUserByLanguage(Long userId, Language language);
+    @Query("SELECT s FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId AND s.language = :language")
+    Page<Song> findAllSongsInRepertoireByUserByLanguage(Long userId, Language language, Pageable pageable);
 
-    @Query("SELECT s, u FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId AND s.composer.id = :composerId")
-    List<Song> findAllSongsInRepertoireByUserByComposer(Long userId, Long composerId);
+    @Query("SELECT s FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId AND s.composer.id = :composerId")
+    Page<Song> findAllSongsInRepertoireByUserByComposer(Long userId, Long composerId, Pageable pageable);
 
-    @Query("SELECT s, u FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId AND s.composer.epoch = :epoch")
-    List<Song> findAllSongsInRepertoireByUserByEpoch(Long userId, Epoch epoch);
+    @Query("SELECT s FROM AppUser u JOIN u.repertoire s WHERE u.id = :userId AND s.composer.epoch = :epoch")
+    Page<Song> findAllSongsInRepertoireByUserByEpoch(Long userId, Epoch epoch, Pageable pageable);
 }
 
 //https://stackoverflow.com/questions/17242408/spring-query-annotation-with-enum-parameter
 //https://stackoverflow.com/questions/44460394/can-i-use-enum-parameter-into-jparepository-nativequery
 //https://stackoverflow.com/questions/8217144/problems-with-making-a-query-when-using-enum-in-entity
+
+//https://www.baeldung.com/jpa-join-types

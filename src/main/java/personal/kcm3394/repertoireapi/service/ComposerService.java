@@ -1,5 +1,7 @@
 package personal.kcm3394.repertoireapi.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import personal.kcm3394.repertoireapi.domain.Composer;
@@ -21,8 +23,8 @@ public class ComposerService {
         this.composerRepository = composerRepository;
     }
 
-    public List<Composer> getAllComposers() {
-        return composerRepository.findAll();
+    public Page<Composer> getAllComposers(Pageable pageable) {
+        return composerRepository.findAll(pageable);
     }
 
     public Composer saveComposer(Composer composer) {
@@ -37,17 +39,17 @@ public class ComposerService {
         composerRepository.deleteById(composerId);
     }
 
-    public List<Composer> searchComposersByName(String nameFragment) {
-        return composerRepository.findAllByNameContainingOrderByName(nameFragment);
+    public Page<Composer> searchComposersByName(String nameFragment, Pageable pageable) {
+        return composerRepository.findAllByNameContainingOrderByName(nameFragment, pageable);
     }
 
-    public List<Composer> searchComposersByEpoch(String epoch) {
+    public Page<Composer> searchComposersByEpoch(String epoch, Pageable pageable) {
         epoch = epoch.toUpperCase();
-        return composerRepository.findAllByEpochOrderByName(Epoch.valueOf(epoch));
+        return composerRepository.findAllByEpochOrderByName(Epoch.valueOf(epoch), pageable);
     }
 
-    public List<Composer> searchComposersByComposition(String titleFragment) {
-        return composerRepository.findAllByCompositions_TitleContains("%" + titleFragment + "%");
+    public Page<Composer> searchComposersByComposition(String titleFragment, Pageable pageable) {
+        return composerRepository.findAllByCompositions_TitleContains("%" + titleFragment + "%", pageable);
     }
 
 

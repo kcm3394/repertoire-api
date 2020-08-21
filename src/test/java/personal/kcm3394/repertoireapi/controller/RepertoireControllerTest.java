@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,7 +22,6 @@ import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,66 +50,75 @@ public class RepertoireControllerTest {
     @Test
     @WithMockUser
     void shouldReturnUserRepertoire() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(songService.findAllSongsInUserRepertoire(any())).thenReturn(getDisplayRepertoire());
+        when(songService.findAllSongsInUserRepertoire(any(), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value(1))
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.content[0].composer.name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnUserRepertoireByStatus() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(songService.findAllSongsInUserRepertoireByStatus(anyLong(), any(Status.class))).thenReturn(getDisplayRepertoire());
+        when(songService.findAllSongsInUserRepertoireByStatus(anyLong(), any(Status.class), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byStatus/PERFORMED")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value(1))
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.content[0].composer.name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnUserRepertoireByLanguage() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(songService.findAllSongsInUserRepertoireByLanguage(anyLong(), any(Language.class))).thenReturn(getDisplayRepertoire());
+        when(songService.findAllSongsInUserRepertoireByLanguage(anyLong(), any(Language.class), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byLanguage/ITALIAN")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value(1))
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.content[0].composer.name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnUserRepertoireByComposer() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(composerService.findComposerById(anyLong())).thenReturn(getMozart());
-        when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong())).thenReturn(getDisplayRepertoire());
+        when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong(), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byComposer/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value(1))
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.content[0].composer.name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
     @WithMockUser
     void shouldReturnNotFoundWhenComposerIdDoesNotExist() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(composerService.findComposerById(anyLong())).thenReturn(null);
-        when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong())).thenReturn(getDisplayRepertoire());
+        when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong(), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byComposer/1")
                 .accept(MediaType.APPLICATION_JSON))
@@ -116,15 +128,17 @@ public class RepertoireControllerTest {
     @Test
     @WithMockUser
     void shouldReturnUserRepertoireByEpoch() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(songService.findAllSongsInUserRepertoireByEpoch(anyLong(), any(Epoch.class))).thenReturn(getDisplayRepertoire());
+        when(songService.findAllSongsInUserRepertoireByEpoch(anyLong(), any(Epoch.class), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byEpoch/CLASSICAL")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id").value(1))
-                .andExpect(jsonPath("$.[0].title").value("Dove sono i bei momenti"))
-                .andExpect(jsonPath("$.[0].composer.name").value("Wolfgang Amadeus Mozart"));
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.content[0].composer.name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
     @Test
@@ -187,9 +201,9 @@ public class RepertoireControllerTest {
         return repertoire;
     }
 
-    private List<Song> getDisplayRepertoire() {
+    private Page<Song> getDisplayRepertoire(Pageable pageable) {
         Set<Song> repertoire = getRepertoire();
-        return new ArrayList<>(repertoire);
+        return new PageImpl<>(new ArrayList<>(repertoire), pageable, repertoire.size());
     }
 
     private Song getDoveSono() {

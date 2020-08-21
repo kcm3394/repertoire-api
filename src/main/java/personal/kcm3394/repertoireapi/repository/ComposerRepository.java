@@ -1,5 +1,7 @@
 package personal.kcm3394.repertoireapi.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,10 +16,10 @@ import java.util.List;
 @Repository
 public interface ComposerRepository extends JpaRepository<Composer, Long> {
 
-    List<Composer> findAllByNameContainingOrderByName(String nameFragment);
+    Page<Composer> findAllByNameContainingOrderByName(String nameFragment, Pageable pageable);
 
-    List<Composer> findAllByEpochOrderByName(Epoch epoch);
+    Page<Composer> findAllByEpochOrderByName(Epoch epoch, Pageable pageable);
 
     @Query("SELECT c FROM Composer c JOIN c.compositions s WHERE s.title LIKE :pattern ORDER BY c.name ASC")
-    List<Composer> findAllByCompositions_TitleContains(String pattern);
+    Page<Composer> findAllByCompositions_TitleContains(String pattern, Pageable pageable);
 }
