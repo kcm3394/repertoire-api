@@ -89,17 +89,6 @@ public class NotesControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn400WhenSongAlreadyHasANote() throws Exception {
-        when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(notesService.getNotesBySongIdAndUserId(anyLong(), anyLong())).thenReturn(getNotes());
-
-        mockMvc.perform(post("/api/notes/add/1")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser
     void shouldReturn200WhenNoteDeleted() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(notesService.getNotesBySongIdAndUserId(anyLong(), anyLong())).thenReturn(getNotes());

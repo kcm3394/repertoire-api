@@ -105,14 +105,14 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn400WhenComposerNotYetCreated() throws Exception {
+    void shouldReturn404WhenComposerNotYetCreated() throws Exception {
         when(composerService.findComposerById(1L)).thenReturn(null);
 
         mockMvc.perform(post("/api/song/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(getDoveSono()))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test

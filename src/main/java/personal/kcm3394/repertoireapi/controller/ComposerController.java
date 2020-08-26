@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Composer;
 import personal.kcm3394.repertoireapi.domain.dtos.ComposerDTO;
+import personal.kcm3394.repertoireapi.exceptions.NoEntityFoundException;
 import personal.kcm3394.repertoireapi.service.ComposerService;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class ComposerController {
     public ResponseEntity<Void> deleteComposer(@PathVariable Long id) {
         Composer composer = composerService.findComposerById(id);
         if (composer == null) {
-            return ResponseEntity.notFound().build();
+            throw new NoEntityFoundException("Composer not found");
         }
         composerService.deleteComposer(id);
         return ResponseEntity.ok().build();

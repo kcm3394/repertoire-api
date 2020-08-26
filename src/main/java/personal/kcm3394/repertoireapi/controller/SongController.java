@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Song;
 import personal.kcm3394.repertoireapi.domain.dtos.ComposerDTO;
 import personal.kcm3394.repertoireapi.domain.dtos.SongDTO;
+import personal.kcm3394.repertoireapi.exceptions.NoEntityFoundException;
 import personal.kcm3394.repertoireapi.service.ComposerService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
@@ -40,7 +41,7 @@ public class SongController {
     @PostMapping("/add")
     public ResponseEntity<SongDTO> addOrUpdateSong(@RequestBody SongDTO songDTO) {
         if (composerService.findComposerById(songDTO.getComposer().getId()) == null) {
-            return ResponseEntity.badRequest().build();
+            throw new NoEntityFoundException("Composer not found");
         }
         Song song = convertSongDTOToEntity(songDTO);
         song.setComposer(composerService.findComposerById(songDTO.getComposer().getId()));
@@ -51,7 +52,7 @@ public class SongController {
     public ResponseEntity<Void> deleteSong(@PathVariable Long id) {
         Song song = songService.findSongById(id);
         if (song == null) {
-            return ResponseEntity.notFound().build();
+            throw new NoEntityFoundException("Song not found");
         }
         songService.deleteSong(id);
         return ResponseEntity.ok().build();

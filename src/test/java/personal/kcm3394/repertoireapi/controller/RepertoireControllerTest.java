@@ -157,12 +157,12 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn400WhenSongDoesNotExist() throws Exception {
+    void shouldReturn404WhenSongDoesNotExist() throws Exception {
         when(songService.findSongById(any())).thenReturn(null);
 
         mockMvc.perform(post("/api/repertoire/add/2")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.Notes;
 import personal.kcm3394.repertoireapi.domain.dtos.NotesDTO;
+import personal.kcm3394.repertoireapi.exceptions.NoEntityFoundException;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.NotesService;
 import personal.kcm3394.repertoireapi.service.SongService;
@@ -31,7 +32,7 @@ public class NotesController {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
         Notes notes = notesService.getNotesBySongIdAndUserId(userId, songId);
         if (notes == null) {
-            return ResponseEntity.notFound().build();
+            throw new NoEntityFoundException("Notes for song not found");
         }
 
         return ResponseEntity.ok(convertEntityToNotesDTO(notes));
@@ -42,13 +43,11 @@ public class NotesController {
                                                 @RequestBody NotesDTO notesDTO,
                                                 Authentication auth) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
-        if (notesService.getNotesBySongIdAndUserId(userId, songId) != null) {
-            return ResponseEntity.badRequest().build();
-        }
-
         Notes notes = convertNotesDTOToEntity(notesDTO);
-        notes.setUser(appUserService.findUserById(userId));
-        notes.setSong(songService.findSongById(songId));
+        if (notesService.getNotesBySongIdAndUserId(userId, songId) == null) {
+            notes.setUser(appUserService.findUserById(userId));
+            notes.setSong(songService.findSongById(songId));
+        }
         Notes savedNotes = notesService.saveNote(notes);
         return ResponseEntity.ok(convertEntityToNotesDTO(savedNotes));
     }
@@ -58,7 +57,7 @@ public class NotesController {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
         Notes notes = notesService.getNotesBySongIdAndUserId(userId, songId);
         if (notes == null) {
-            return ResponseEntity.notFound().build();
+            throw new NoEntityFoundException("Notes for song not found");
         }
 
         notesService.deleteNotes(notes.getId());

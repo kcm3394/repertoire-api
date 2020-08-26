@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.repertoireapi.domain.AppUser;
 import personal.kcm3394.repertoireapi.domain.CreateUserRequest;
 import personal.kcm3394.repertoireapi.domain.dtos.AppUserDTO;
+import personal.kcm3394.repertoireapi.exceptions.NoEntityFoundException;
+import personal.kcm3394.repertoireapi.exceptions.UserCreationException;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 
 /**
@@ -31,13 +33,13 @@ public class AppUserController {
         AppUser appUser = new AppUser();
 
         if(appUserService.findUserByUsername(createUserRequest.getUsername()) != null) {
-            return ResponseEntity.badRequest().build();
+            throw new UserCreationException("Username already exists");
         }
         appUser.setUsername(createUserRequest.getUsername());
 
         if(createUserRequest.getPassword().length() < 8 ||
                 !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
-            return ResponseEntity.badRequest().build();
+            throw new UserCreationException("Passwords do not match");
         }
         appUser.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
         appUser.setFach(createUserRequest.getFach());
@@ -50,7 +52,10 @@ public class AppUserController {
     @GetMapping("/id/{id}")
     public ResponseEntity<AppUserDTO> findUserById(@PathVariable Long id) {
         AppUser appUser = appUserService.findUserById(id);
-        return appUser != null ? ResponseEntity.ok(covertEntityToAppUserDTO(appUser)) : ResponseEntity.notFound().build();
+        if (appUser == null) {
+            throw new NoEntityFoundException("User " + id + " not found");
+        }
+        return ResponseEntity.ok(covertEntityToAppUserDTO(appUser));
     }
 
     private static AppUserDTO covertEntityToAppUserDTO(AppUser appUser) {

@@ -15,6 +15,8 @@ import personal.kcm3394.repertoireapi.domain.dtos.SongDTO;
 import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 import personal.kcm3394.repertoireapi.domain.enums.Language;
 import personal.kcm3394.repertoireapi.domain.enums.Status;
+import personal.kcm3394.repertoireapi.exceptions.NoEntityFoundException;
+import personal.kcm3394.repertoireapi.exceptions.RepertoireException;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.ComposerService;
 import personal.kcm3394.repertoireapi.service.SongService;
@@ -68,7 +70,7 @@ public class RepertoireController {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
         Composer composer = composerService.findComposerById(composerId);
         if (composer == null) {
-            return ResponseEntity.notFound().build();
+            throw new NoEntityFoundException("Composer not found");
         }
 
         Page<Song> repertoireByComposer = songService.findAllSongsInUserRepertoireByComposer(userId, composerId, pageable);
@@ -86,13 +88,13 @@ public class RepertoireController {
     public ResponseEntity<SongDTO> addSongToRepertoire(Authentication auth, @PathVariable Long id) {
         Song song = songService.findSongById(id);
         if (song == null) {
-            return ResponseEntity.badRequest().build();
+            throw new NoEntityFoundException("Song not found");
         }
 
         AppUser appUser = appUserService.findUserByUsername(auth.getName());
         Set<Song> repertoire = appUser.getRepertoire();
         if (!repertoire.add(song)) {
-            return ResponseEntity.badRequest().build();
+            throw new RepertoireException("Song is already in your repertoire");
         }
 
         repertoire.add(song);
@@ -105,13 +107,13 @@ public class RepertoireController {
     public ResponseEntity<Void> deleteSongFromRepertoire(Authentication auth, @PathVariable Long id) {
         Song song = songService.findSongById(id);
         if (song == null) {
-            return ResponseEntity.badRequest().build();
+            throw new NoEntityFoundException("Song not found");
         }
 
         AppUser appUser = appUserService.findUserByUsername(auth.getName());
         Set<Song> repertoire = appUser.getRepertoire();
         if (!repertoire.remove(song)) {
-            return ResponseEntity.badRequest().build();
+            throw new RepertoireException("Song is not in your repertoire");
         }
 
         repertoire.remove(song);
