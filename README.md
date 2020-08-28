@@ -94,7 +94,7 @@ All testing is run with code coverage to achieve a goal of at least 80%. This pr
 - [ ] Add logging features
 - [ ] Unit testing for database access layer
 - [ ] Collaborate with UI engineer to add front-end layer
-- [ ] Host project on a domain
+- [x] Host project on a domain
 
 ## Motivation
 
