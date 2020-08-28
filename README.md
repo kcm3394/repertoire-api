@@ -2,6 +2,8 @@
 
 Vocalist Repertoire is an easy-to-use system that allows multiple vocalists to store their complete repertoire with song details, composer information, learning/performed status, and additional notes/links.
 
+The app is deployed through Heroku and can be interacted with through the Swagger UI at https://vocalistsrepertoire.herokuapp.com/swagger-ui.html.
+
 ## Built With
 
 * [IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/download/#section=mac)
@@ -37,9 +39,9 @@ Vocalist Repertoire is an easy-to-use system that allows multiple vocalists to s
 
 ## Operations
 
-Once the repo has been downloaded and the application is running, the Swagger UI can be accessed at http://localhost:8080/swagger-ui.html.
+The Swagger UI can be accessed at https://vocalistsrepertoire.herokuapp.com/swagger-ui.html.
 
-Below are sample JSONs for POST actions to run through Swagger.
+Below are sample JSONs for POST actions to run through Swagger. User needs to be created to do authenticated commands. A composer must be created before songs can be added - use the assigned ID in the ID field when adding a song.
 
 ### Create a User
 
@@ -70,12 +72,12 @@ Below are sample JSONs for POST actions to run through Swagger.
 `POST` `/api/song/add`
 ```json
 {
-    "title": "Porgi amor qualche ristoro",
+    "title": "O mio babbino caro",
     "composer": {
         "id": "1"
         },
-    "containingWork": "Le nozze di Figaro",
-    "duration": "4 minutes",
+    "containingWork": "Gianni Schicchi",
+    "duration": "3 minutes",
     "language": "ITALIAN",
     "type": "ARIA"
 }

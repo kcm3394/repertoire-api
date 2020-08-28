@@ -39,7 +39,7 @@ public class AppUserController {
 
         if(createUserRequest.getPassword().length() < 8 ||
                 !createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
-            throw new UserCreationException("Passwords do not match");
+            throw new UserCreationException("Password must be at least 8 characters long and passwords must match");
         }
         appUser.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
         appUser.setFach(createUserRequest.getFach());
