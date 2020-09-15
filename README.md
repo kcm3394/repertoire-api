@@ -90,14 +90,14 @@ All testing has been run with code coverage to achieve a goal of at least 80%. T
 ## ToDo List
 
 - [x] Make results pageable
-- [ ] Upgrade Basic Auth to JWT
-- [ ] Add logging features
+- [x] Host project on a domain
 - [x] Complete unit testing for service layer
 - [x] Complete unit testing for repository layer
+- [ ] Expand README to include how to run tests, how to run the server, how to call an endpoint
+- [ ] Upgrade Basic Auth to JWT
+- [ ] Add logging features
 - [ ] Database queries should ignore case
 - [ ] Collaborate with UI engineer to add front-end layer
-- [x] Host project on a domain
-- [ ] Expand README to include how to run tests, how to run the server, how to call an endpoint
 
 ## Motivation
 
