@@ -8,7 +8,7 @@ import personal.kcm3394.repertoireapi.domain.Composer;
 import personal.kcm3394.repertoireapi.domain.enums.Epoch;
 import personal.kcm3394.repertoireapi.repository.ComposerRepository;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Makes calls to the database layer related to CRUD operations for Composers
@@ -31,8 +31,8 @@ public class ComposerService {
         return composerRepository.save(composer);
     }
 
-    public Composer findComposerById(Long composerId) {
-        return composerRepository.findById(composerId).orElse(null);
+    public Optional<Composer> findComposerById(Long composerId) {
+        return composerRepository.findById(composerId);
     }
 
     public void deleteComposer(Long composerId) {
@@ -44,8 +44,7 @@ public class ComposerService {
     }
 
     public Page<Composer> searchComposersByEpoch(String epoch, Pageable pageable) {
-        epoch = epoch.toUpperCase();
-        return composerRepository.findAllByEpochOrderByName(Epoch.valueOf(epoch), pageable);
+        return composerRepository.findAllByEpochOrderByName(Epoch.valueOf(epoch.toUpperCase()), pageable);
     }
 
     public Page<Composer> searchComposersByComposition(String titleFragment, Pageable pageable) {

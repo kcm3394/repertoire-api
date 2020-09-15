@@ -19,6 +19,8 @@ import personal.kcm3394.repertoireapi.service.AppUserService;
 import personal.kcm3394.repertoireapi.service.NotesService;
 import personal.kcm3394.repertoireapi.service.SongService;
 
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -47,7 +49,7 @@ public class NotesControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnNotesForSong() throws Exception {
+    void should_return_notes_for_song() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(notesService.getNotesBySongIdAndUserId(anyLong(), anyLong())).thenReturn(getNotes());
 
@@ -60,7 +62,7 @@ public class NotesControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn404WhenSongHasNoNote() throws Exception {
+    void should_return_404_when_song_has_no_note() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(notesService.getNotesBySongIdAndUserId(anyLong(), anyLong())).thenReturn(null);
 
@@ -71,11 +73,11 @@ public class NotesControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnAddedNotesToSong() throws Exception {
+    void should_return_added_notes_to_song() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(notesService.getNotesBySongIdAndUserId(anyLong(), anyLong())).thenReturn(null);
-        when(appUserService.findUserById(anyLong())).thenReturn(getAppUser());
-        when(songService.findSongById(anyLong())).thenReturn(getDoveSono());
+        when(appUserService.findUserById(anyLong())).thenReturn(Optional.of(getAppUser()));
+        when(songService.findSongById(anyLong())).thenReturn(Optional.of(getDoveSono()));
         when(notesService.saveNote(any(Notes.class))).thenReturn(getNotes());
 
         mockMvc.perform(post("/api/notes/add/1")
@@ -89,7 +91,7 @@ public class NotesControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn200WhenNoteDeleted() throws Exception {
+    void should_return_200_when_note_deleted() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(notesService.getNotesBySongIdAndUserId(anyLong(), anyLong())).thenReturn(getNotes());
 
@@ -99,7 +101,7 @@ public class NotesControllerTest {
     }
 
     @Test
-    void shouldReturn401WhenAccessingNotesWithoutAuth() throws Exception {
+    void should_return_401_when_accessing_notes_without_auth() throws Exception {
         mockMvc.perform(get("/api/notes/song/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());

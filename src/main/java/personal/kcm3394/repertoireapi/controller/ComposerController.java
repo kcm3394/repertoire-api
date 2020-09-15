@@ -13,6 +13,7 @@ import personal.kcm3394.repertoireapi.service.ComposerService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles user requests related to CRUD operations for Composers and returns an HTTP status
@@ -41,8 +42,8 @@ public class ComposerController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteComposer(@PathVariable Long id) {
-        Composer composer = composerService.findComposerById(id);
-        if (composer == null) {
+        Optional<Composer> composer = composerService.findComposerById(id);
+        if (composer.isEmpty()) {
             throw new NoEntityFoundException("Composer not found");
         }
         composerService.deleteComposer(id);

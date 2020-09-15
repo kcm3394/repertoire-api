@@ -85,16 +85,19 @@ Below are sample JSONs for POST actions to run through Swagger. User needs to be
 
 ## Testing
 
-All testing is run with code coverage to achieve a goal of at least 80%. This project uses Mockito and JUnit5 as its testing libraries.
+All testing has been run with code coverage to achieve a goal of at least 80%. This project uses Mockito and JUnit5 as its testing libraries.
 
 ## ToDo List
 
 - [x] Make results pageable
 - [ ] Upgrade Basic Auth to JWT
 - [ ] Add logging features
-- [ ] Unit testing for database access layer
+- [x] Complete unit testing for service layer
+- [x] Complete unit testing for repository layer
+- [ ] Database queries should ignore case
 - [ ] Collaborate with UI engineer to add front-end layer
 - [x] Host project on a domain
+- [ ] Expand README to include how to run tests, how to run the server, how to call an endpoint
 
 ## Motivation
 

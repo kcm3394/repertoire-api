@@ -20,6 +20,7 @@ import personal.kcm3394.repertoireapi.service.ComposerService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,7 +44,7 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnPageOfComposers() throws Exception {
+    void should_return_page_of_composers() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(composerService.getAllComposers(any(Pageable.class))).thenReturn(getAllComposers(pageable));
 
@@ -57,7 +58,7 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnCreatedComposer() throws Exception {
+    void should_return_created_composer() throws Exception {
         when(composerService.saveComposer(any(Composer.class))).thenReturn(getComposerMozart());
 
         mockMvc.perform(post("/api/composer/add")
@@ -71,8 +72,8 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn200WhenComposerDeleted() throws Exception {
-        when(composerService.findComposerById(1L)).thenReturn(getComposerMozart());
+    void should_return_200_when_composer_deleted() throws Exception {
+        when(composerService.findComposerById(1L)).thenReturn(Optional.of(getComposerMozart()));
 
         mockMvc.perform(delete("/api/composer/delete/1")
                 .accept(MediaType.APPLICATION_JSON))
@@ -80,7 +81,7 @@ public class ComposerControllerTest {
     }
 
     @Test
-    void shouldReturn401WhenAccessingComposersWithoutAuth() throws Exception {
+    void should_return_401_when_accessing_composers_without_auth() throws Exception {
         mockMvc.perform(get("/api/composer")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -88,8 +89,8 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn404WhenComposerIdDoesNotExist() throws Exception {
-        when(composerService.findComposerById(1L)).thenReturn(null);
+    void should_return_404_when_composer_id_does_not_exist() throws Exception {
+        when(composerService.findComposerById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/composer/delete/1")
                 .accept(MediaType.APPLICATION_JSON))
@@ -98,7 +99,7 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnPageWithMozartWhenSearchByName() throws Exception {
+    void should_return_page_with_mozart_when_search_by_name() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(getComposerMozart());
@@ -114,7 +115,7 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListWithMozartWhenSearchByEpoch() throws Exception {
+    void should_return_list_with_mozart_when_search_by_epoch() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(getComposerMozart());
@@ -130,7 +131,7 @@ public class ComposerControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListWithMozartWhenSearchByComposition() throws Exception {
+    void should_return_list_with_mozart_when_search_by_composition() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(getComposerMozart());

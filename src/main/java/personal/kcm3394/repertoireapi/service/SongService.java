@@ -10,6 +10,8 @@ import personal.kcm3394.repertoireapi.domain.enums.Language;
 import personal.kcm3394.repertoireapi.domain.enums.Status;
 import personal.kcm3394.repertoireapi.repository.SongRepository;
 
+import java.util.Optional;
+
 /**
  * Makes calls to the database layer related to CRUD operations for Songs
  */
@@ -31,8 +33,8 @@ public class SongService {
         return songRepository.save(song);
     }
 
-    public Song findSongById(Long songId) {
-        return songRepository.findById(songId).orElse(null);
+    public Optional<Song> findSongById(Long songId) {
+        return songRepository.findById(songId);
     }
 
     public void deleteSong(Long songId) {

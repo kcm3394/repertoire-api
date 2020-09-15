@@ -11,6 +11,8 @@ import personal.kcm3394.repertoireapi.exceptions.NoEntityFoundException;
 import personal.kcm3394.repertoireapi.exceptions.UserCreationException;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 
+import java.util.Optional;
+
 /**
  * Handles user requests for creating a new user and ensuring password requirements are met.
  * Ensures password is securely stored in the database by using BCryptPasswordEncoder.
@@ -44,18 +46,18 @@ public class AppUserController {
         appUser.setPassword(bCryptPasswordEncoder.encode(createUserRequest.getPassword()));
         appUser.setFach(createUserRequest.getFach());
 
-        appUserService.saveOrUpdateUser(appUser);
+        appUserService.saveUser(appUser);
         AppUserDTO appUserDTO = covertEntityToAppUserDTO(appUser);
         return ResponseEntity.ok(appUserDTO);
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<AppUserDTO> findUserById(@PathVariable Long id) {
-        AppUser appUser = appUserService.findUserById(id);
-        if (appUser == null) {
+        Optional<AppUser> appUser = appUserService.findUserById(id);
+        if (appUser.isEmpty()) {
             throw new NoEntityFoundException("User " + id + " not found");
         }
-        return ResponseEntity.ok(covertEntityToAppUserDTO(appUser));
+        return ResponseEntity.ok(covertEntityToAppUserDTO(appUser.get()));
     }
 
     private static AppUserDTO covertEntityToAppUserDTO(AppUser appUser) {

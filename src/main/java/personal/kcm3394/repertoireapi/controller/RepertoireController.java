@@ -23,6 +23,7 @@ import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -68,8 +69,8 @@ public class RepertoireController {
     @GetMapping("/byComposer/{composerId}")
     public ResponseEntity<Page<SongDTO>> getRepertoireListByComposer(Authentication auth, @PathVariable Long composerId, Pageable pageable) {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
-        Composer composer = composerService.findComposerById(composerId);
-        if (composer == null) {
+        Optional<Composer> composer = composerService.findComposerById(composerId);
+        if (composer.isEmpty()) {
             throw new NoEntityFoundException("Composer not found");
         }
 
@@ -86,11 +87,7 @@ public class RepertoireController {
 
     @PostMapping("/add/{id}")
     public ResponseEntity<SongDTO> addSongToRepertoire(Authentication auth, @PathVariable Long id) {
-        Song song = songService.findSongById(id);
-        if (song == null) {
-            throw new NoEntityFoundException("Song not found");
-        }
-
+        Song song = returnSongIfPresentElseThrowException(id);
         AppUser appUser = appUserService.findUserByUsername(auth.getName());
         Set<Song> repertoire = appUser.getRepertoire();
         if (!repertoire.add(song)) {
@@ -99,17 +96,13 @@ public class RepertoireController {
 
         repertoire.add(song);
         appUser.setRepertoire(repertoire);
-        appUserService.saveOrUpdateUser(appUser);
+        appUserService.saveUser(appUser);
         return ResponseEntity.ok(convertEntityToSongDTO(song));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteSongFromRepertoire(Authentication auth, @PathVariable Long id) {
-        Song song = songService.findSongById(id);
-        if (song == null) {
-            throw new NoEntityFoundException("Song not found");
-        }
-
+        Song song = returnSongIfPresentElseThrowException(id);
         AppUser appUser = appUserService.findUserByUsername(auth.getName());
         Set<Song> repertoire = appUser.getRepertoire();
         if (!repertoire.remove(song)) {
@@ -118,8 +111,16 @@ public class RepertoireController {
 
         repertoire.remove(song);
         appUser.setRepertoire(repertoire);
-        appUserService.saveOrUpdateUser(appUser);
+        appUserService.saveUser(appUser);
         return ResponseEntity.ok().build();
+    }
+
+    private Song returnSongIfPresentElseThrowException(Long songId) {
+        Optional<Song> optionalSong = songService.findSongById(songId);
+        if (optionalSong.isEmpty()) {
+            throw new NoEntityFoundException("Song not found");
+        }
+        return optionalSong.get();
     }
 
     private static PageImpl<SongDTO> convertPageOfEntitiesToPageImplOfSongDTOs(Page<Song> songs, Pageable pageable) {

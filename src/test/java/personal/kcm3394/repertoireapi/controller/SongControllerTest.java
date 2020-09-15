@@ -22,6 +22,7 @@ import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,7 +49,7 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListOfSongs() throws Exception {
+    void should_return_list_of_songs() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(songService.getAllSongs(any(Pageable.class))).thenReturn(getAllSongs(pageable));
 
@@ -62,9 +63,9 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnCreatedSong() throws Exception {
+    void should_return_created_song() throws Exception {
         when(songService.saveSong(any(Song.class))).thenReturn(getDoveSono());
-        when(composerService.findComposerById(1L)).thenReturn(getMozart());
+        when(composerService.findComposerById(1L)).thenReturn(Optional.of(getMozart()));
 
         mockMvc.perform(post("/api/song/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -78,8 +79,8 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn200WhenSongDeleted() throws Exception {
-        when(songService.findSongById(1L)).thenReturn(getDoveSono());
+    void should_return_200_when_song_deleted() throws Exception {
+        when(songService.findSongById(1L)).thenReturn(Optional.of(getDoveSono()));
 
         mockMvc.perform(delete("/api/song/delete/1")
                 .accept(MediaType.APPLICATION_JSON))
@@ -87,7 +88,7 @@ public class SongControllerTest {
     }
 
     @Test
-    void shouldReturn401WhenAccessingSongsWithoutAuth() throws Exception {
+    void should_return_401_when_accessing_songs_without_auth() throws Exception {
         mockMvc.perform(get("/api/song")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -95,8 +96,8 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn404WhenSongIdDoesNotExist() throws Exception {
-        when(songService.findSongById(1L)).thenReturn(null);
+    void should_return_404_when_song_id_does_not_exist() throws Exception {
+        when(songService.findSongById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/api/song/delete/1")
                 .accept(MediaType.APPLICATION_JSON))
@@ -105,8 +106,8 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn404WhenComposerNotYetCreated() throws Exception {
-        when(composerService.findComposerById(1L)).thenReturn(null);
+    void should_return_404_when_composer_not_yet_created() throws Exception {
+        when(composerService.findComposerById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/song/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +118,7 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListWithDoveSonoWhenSearchByTitle() throws Exception {
+    void should_return_list_with_dove_sono_when_search_by_title() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Song> justDoveSono = new ArrayList<>();
         justDoveSono.add(getDoveSono());
@@ -133,7 +134,7 @@ public class SongControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnListWithDoveSonoWhensSearchByComposer() throws Exception {
+    void should_return_list_with_dove_sono_when_search_by_composer() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         ArrayList<Song> justDoveSono = new ArrayList<>();
         justDoveSono.add(getDoveSono());

@@ -45,8 +45,14 @@ public class NotesController {
         Long userId = appUserService.findUserByUsername(auth.getName()).getId();
         Notes notes = convertNotesDTOToEntity(notesDTO);
         if (notesService.getNotesBySongIdAndUserId(userId, songId) == null) {
-            notes.setUser(appUserService.findUserById(userId));
-            notes.setSong(songService.findSongById(songId));
+            if (appUserService.findUserById(userId).isEmpty()) {
+                throw new NoEntityFoundException("User not found");
+            }
+            if (songService.findSongById(songId).isEmpty()) {
+                throw new NoEntityFoundException("Song not found");
+            }
+            notes.setUser(appUserService.findUserById(userId).get());
+            notes.setSong(songService.findSongById(songId).get());
         }
         Notes savedNotes = notesService.saveNote(notes);
         return ResponseEntity.ok(convertEntityToNotesDTO(savedNotes));

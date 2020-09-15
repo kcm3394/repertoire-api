@@ -21,10 +21,7 @@ import personal.kcm3394.repertoireapi.domain.enums.Type;
 import personal.kcm3394.repertoireapi.service.AppUserService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,8 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//If you are using JUnit 5, there’s no need to add the equivalent @ExtendWith(SpringExtension.class)
-//as @SpringBootTest and the other @…Test annotations are already annotated with it.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AppUserControllerTest {
@@ -51,7 +46,7 @@ public class AppUserControllerTest {
     private BCryptPasswordEncoder encoder;
 
     @Test
-    void shouldReturnCreatedUser() throws Exception {
+    void should_return_created_user() throws Exception {
         mockMvc.perform(post("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(getCreateUserRequest()))
@@ -62,7 +57,7 @@ public class AppUserControllerTest {
     }
 
     @Test
-    void shouldReturn400WhenUsernameAlreadyExists() throws Exception {
+    void should_return_400_when_username_already_exists() throws Exception {
         AppUser appUser = getAppUser();
         when(appUserService.findUserByUsername("testUser")).thenReturn(appUser);
 
@@ -74,7 +69,7 @@ public class AppUserControllerTest {
     }
 
     @Test
-    void shouldReturn400WhenPasswordsDoNotMatch() throws Exception {
+    void should_return_400_when_password_doesnt_match() throws Exception {
         CreateUserRequest request = getCreateUserRequest();
         request.setConfirmPassword("testpassword");
 
@@ -86,7 +81,7 @@ public class AppUserControllerTest {
     }
 
     @Test
-    void shouldReturn400WhenPasswordLengthReqNotMet() throws Exception {
+    void should_return_400_when_password_length_req_not_met() throws Exception {
         CreateUserRequest request = getCreateUserRequest();
         request.setPassword("test");
         request.setConfirmPassword("test");
@@ -100,10 +95,10 @@ public class AppUserControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnAppUserWithIdAndRepertoire() throws Exception {
+    void should_return_app_user_with_id_and_repertoire() throws Exception {
         AppUser appUser = getAppUser();
         appUser.setRepertoire(getRepertoire());
-        when(appUserService.findUserById(1L)).thenReturn(appUser);
+        when(appUserService.findUserById(1L)).thenReturn(Optional.of(appUser));
 
         mockMvc.perform(
                 get("/api/user/id/1")
@@ -118,7 +113,7 @@ public class AppUserControllerTest {
     }
 
     @Test
-    void shouldReturn401WhenAccessingAuthorizedUrl() throws Exception {
+    void should_return_401_when_accessing_authorized_url() throws Exception {
         mockMvc.perform(get("/api/user/id/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
@@ -126,8 +121,8 @@ public class AppUserControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn404WhenUserIdDoesNotExist() throws Exception {
-        when(appUserService.findUserById(1L)).thenReturn(null);
+    void should_return_404_when_user_id_does_not_exist() throws Exception {
+        when(appUserService.findUserById(1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/user/id/1")
                 .accept(MediaType.APPLICATION_JSON))

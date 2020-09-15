@@ -22,6 +22,7 @@ import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +50,7 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnUserRepertoire() throws Exception {
+    void should_return_user_repertoire() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(songService.findAllSongsInUserRepertoire(any(), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
@@ -65,7 +66,7 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnUserRepertoireByStatus() throws Exception {
+    void should_return_user_repertoire_by_status() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(songService.findAllSongsInUserRepertoireByStatus(anyLong(), any(Status.class), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
@@ -81,7 +82,7 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnUserRepertoireByLanguage() throws Exception {
+    void should_return_user_repertoire_by_language() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(songService.findAllSongsInUserRepertoireByLanguage(anyLong(), any(Language.class), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
@@ -97,10 +98,10 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnUserRepertoireByComposer() throws Exception {
+    void should_return_user_repertoire_by_composer() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(composerService.findComposerById(anyLong())).thenReturn(getMozart());
+        when(composerService.findComposerById(anyLong())).thenReturn(Optional.of(getMozart()));
         when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong(), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byComposer/1")
@@ -114,10 +115,10 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnNotFoundWhenComposerIdDoesNotExist() throws Exception {
+    void should_return_not_found_when_composer_id_does_not_exist() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(composerService.findComposerById(anyLong())).thenReturn(null);
+        when(composerService.findComposerById(anyLong())).thenReturn(Optional.empty());
         when(songService.findAllSongsInUserRepertoireByComposer(anyLong(), anyLong(), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
 
         mockMvc.perform(get("/api/repertoire/byComposer/1")
@@ -127,7 +128,7 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnUserRepertoireByEpoch() throws Exception {
+    void should_return_user_repertoire_by_epoch() throws Exception {
         Pageable pageable = PageRequest.of(0, 5);
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
         when(songService.findAllSongsInUserRepertoireByEpoch(anyLong(), any(Epoch.class), any(Pageable.class))).thenReturn(getDisplayRepertoire(pageable));
@@ -143,9 +144,9 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturnSongAddedToRepertoire() throws Exception {
+    void should_return_song_added_to_repertoire() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(songService.findSongById(any())).thenReturn(getNessunDorma());
+        when(songService.findSongById(any())).thenReturn(Optional.of(getNessunDorma()));
 
         mockMvc.perform(post("/api/repertoire/add/2")
                 .accept(MediaType.APPLICATION_JSON))
@@ -157,8 +158,8 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn404WhenSongDoesNotExist() throws Exception {
-        when(songService.findSongById(any())).thenReturn(null);
+    void should_return_404_when_song_does_not_exist() throws Exception {
+        when(songService.findSongById(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/repertoire/add/2")
                 .accept(MediaType.APPLICATION_JSON))
@@ -167,9 +168,9 @@ public class RepertoireControllerTest {
 
     @Test
     @WithMockUser
-    void shouldReturn400WhenDeletingSongNotInRep() throws Exception {
+    void should_return_400_when_deleting_song_not_in_rep() throws Exception {
         when(appUserService.findUserByUsername(any())).thenReturn(getAppUser());
-        when(songService.findSongById(any())).thenReturn(getNessunDorma());
+        when(songService.findSongById(any())).thenReturn(Optional.of(getNessunDorma()));
 
         mockMvc.perform(delete("/api/repertoire/delete/2")
                 .accept(MediaType.APPLICATION_JSON))
@@ -177,7 +178,7 @@ public class RepertoireControllerTest {
     }
 
     @Test
-    void shouldReturn401WhenAccessingRepWithoutAuth() throws Exception {
+    void should_return_401_when_accessing_rep_without_auth() throws Exception {
         mockMvc.perform(get("/api/repertoire")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());

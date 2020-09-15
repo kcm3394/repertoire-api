@@ -15,6 +15,7 @@ import personal.kcm3394.repertoireapi.service.SongService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Handles user requests related to CRUD operations for Songs and returns an HTTP status
@@ -40,18 +41,18 @@ public class SongController {
 
     @PostMapping("/add")
     public ResponseEntity<SongDTO> addOrUpdateSong(@RequestBody SongDTO songDTO) {
-        if (composerService.findComposerById(songDTO.getComposer().getId()) == null) {
+        if (composerService.findComposerById(songDTO.getComposer().getId()).isEmpty()) {
             throw new NoEntityFoundException("Composer not found");
         }
         Song song = convertSongDTOToEntity(songDTO);
-        song.setComposer(composerService.findComposerById(songDTO.getComposer().getId()));
+        song.setComposer(composerService.findComposerById(songDTO.getComposer().getId()).get());
         return ResponseEntity.ok(convertEntityToSongDTO(songService.saveSong(song)));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteSong(@PathVariable Long id) {
-        Song song = songService.findSongById(id);
-        if (song == null) {
+        Optional<Song> song = songService.findSongById(id);
+        if (song.isEmpty()) {
             throw new NoEntityFoundException("Song not found");
         }
         songService.deleteSong(id);
