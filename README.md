@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/kcm3394/repertoire-api.svg?style=svg)](https://circleci.com/gh/kcm3394/repertoire-api)
 # Vocalist Repertoire
 
 Vocalist Repertoire is an easy-to-use system that allows multiple vocalists to store their complete repertoire with song details, composer information, learning/performed status, and additional notes/links.
