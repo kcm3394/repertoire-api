@@ -5,6 +5,8 @@ Vocalist Repertoire is an easy-to-use system that allows multiple vocalists to s
 
 The app is deployed through Heroku and can be interacted with through the Swagger UI at https://vocalistsrepertoire.herokuapp.com/swagger-ui.html.
 
+#### Currently refactoring to utilize microservices architecture and Docker
+
 ## Built With
 
 * [IntelliJ IDEA Ultimate](https://www.jetbrains.com/idea/download/#section=mac)
@@ -90,18 +92,16 @@ All testing has been run with code coverage to achieve a goal of at least 80%. T
 
 ## ToDo List
 
-- [x] Make results pageable
-- [x] Host project on a domain
-- [x] Complete unit testing for service layer
-- [x] Complete unit testing for repository layer
+- [ ] Refactor original app into microservices (User, Song, Composer, Notes)
+- [ ] Add Spring Cloud deployment tools - Eureka, Gateway, Loadbalancer
+- [ ] Create and push Docker images for application services
 - [ ] Expand README to include how to run tests, how to run the server, how to call an endpoint
 - [ ] Upgrade Basic Auth to JWT
 - [ ] Add logging features
 - [ ] Database queries should ignore case
-- [ ] Collaborate with UI engineer to add front-end layer
 
 ## Motivation
 
 As a vocalist myself, I remember struggling to create the repertoire part of my artistic resume. I would have to search through pages of songs and type up titles, composers, if I performed the song, etc. This (painful) process inspired me to create something that can store all this information for me so that when I needed it, I could easily get all the information necessary. Using my app, I can now easily show people which songs I can sing in Italian, how many arias I know, and which songs by Mozart I have performed.
 
-I plan to continue building upon this project and eventually release it to help other vocalists who may be struggling with keeping tabs on the vast array of songs in their repertoire.
+I plan to continue building upon this project so that I can help other vocalists who may be struggling with keeping tabs on the vast array of songs in their repertoire.
