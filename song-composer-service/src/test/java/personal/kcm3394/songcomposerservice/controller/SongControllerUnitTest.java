@@ -1,5 +1,6 @@
 package personal.kcm3394.songcomposerservice.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,11 +11,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import personal.kcm3394.songcomposerservice.domain.Composer;
 import personal.kcm3394.songcomposerservice.domain.Language;
 import personal.kcm3394.songcomposerservice.domain.Song;
 import personal.kcm3394.songcomposerservice.domain.Type;
+import personal.kcm3394.songcomposerservice.service.ComposerService;
 import personal.kcm3394.songcomposerservice.service.SongService;
 
 import java.util.ArrayList;
@@ -24,8 +27,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,8 +38,14 @@ public class SongControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private SongService songService;
+
+    @MockBean
+    private ComposerService composerService;
 
     @Test
     void should_return_list_of_songs() throws Exception {
@@ -52,7 +60,20 @@ public class SongControllerUnitTest {
                 .andExpect(jsonPath("$.pageable.paged").value("true"));
     }
 
-    //todo implement test for addOrUpdateSong method
+    @Test
+    void should_return_created_song() throws Exception {
+        when(songService.saveSong(any(Song.class))).thenReturn(buildDoveSono());
+        when(composerService.findComposerById(1L)).thenReturn(Optional.of(buildMozart()));
+
+        mockMvc.perform(post("/api/v2/songs/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildDoveSono()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.composer.name").value("Wolfgang Amadeus Mozart"));
+    }
 
     @Test
     void should_return_200_when_song_deleted() throws Exception {

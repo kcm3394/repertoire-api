@@ -24,9 +24,7 @@ public class Song {
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinTable(name = "composer_song",
-            joinColumns = @JoinColumn(name = "composer_id"),
-            inverseJoinColumns = @JoinColumn(name = "song_id"))
+    @JoinColumn(name = "composer_id")
     @NotNull
     @JsonIgnoreProperties("compositions")
     private Composer composer;
