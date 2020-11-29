@@ -8,9 +8,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import personal.kcm3394.songcomposerservice.domain.Composer;
-import personal.kcm3394.songcomposerservice.domain.Epoch;
-import personal.kcm3394.songcomposerservice.domain.Song;
+import personal.kcm3394.songcomposerservice.model.Composer;
+import personal.kcm3394.songcomposerservice.model.Epoch;
+import personal.kcm3394.songcomposerservice.model.Song;
 
 import java.util.Optional;
 

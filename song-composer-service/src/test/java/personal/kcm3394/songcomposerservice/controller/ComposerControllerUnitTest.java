@@ -12,8 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import personal.kcm3394.songcomposerservice.domain.Composer;
-import personal.kcm3394.songcomposerservice.domain.Epoch;
+import personal.kcm3394.songcomposerservice.model.Composer;
+import personal.kcm3394.songcomposerservice.model.Epoch;
 import personal.kcm3394.songcomposerservice.service.ComposerService;
 
 import java.time.LocalDate;

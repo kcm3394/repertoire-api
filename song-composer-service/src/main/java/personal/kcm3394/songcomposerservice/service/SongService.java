@@ -2,7 +2,7 @@ package personal.kcm3394.songcomposerservice.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import personal.kcm3394.songcomposerservice.domain.Song;
+import personal.kcm3394.songcomposerservice.model.Song;
 
 import java.util.Optional;
 

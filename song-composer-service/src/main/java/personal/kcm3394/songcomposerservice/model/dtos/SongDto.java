@@ -1,9 +1,9 @@
-package personal.kcm3394.songcomposerservice.domain.dtos;
+package personal.kcm3394.songcomposerservice.model.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
-import personal.kcm3394.songcomposerservice.domain.Language;
-import personal.kcm3394.songcomposerservice.domain.Type;
+import personal.kcm3394.songcomposerservice.model.Language;
+import personal.kcm3394.songcomposerservice.model.Type;
 
 @Getter
 @Setter

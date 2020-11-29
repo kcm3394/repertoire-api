@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import personal.kcm3394.songcomposerservice.domain.Song;
+import personal.kcm3394.songcomposerservice.model.Song;
 
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {

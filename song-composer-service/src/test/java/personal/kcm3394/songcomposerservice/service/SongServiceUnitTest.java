@@ -9,10 +9,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import personal.kcm3394.songcomposerservice.domain.Composer;
-import personal.kcm3394.songcomposerservice.domain.Language;
-import personal.kcm3394.songcomposerservice.domain.Song;
-import personal.kcm3394.songcomposerservice.domain.Type;
+import personal.kcm3394.songcomposerservice.model.Composer;
+import personal.kcm3394.songcomposerservice.model.Language;
+import personal.kcm3394.songcomposerservice.model.Song;
+import personal.kcm3394.songcomposerservice.model.Type;
 import personal.kcm3394.songcomposerservice.repository.SongRepository;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package personal.kcm3394.songcomposerservice.domain;
+package personal.kcm3394.songcomposerservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;

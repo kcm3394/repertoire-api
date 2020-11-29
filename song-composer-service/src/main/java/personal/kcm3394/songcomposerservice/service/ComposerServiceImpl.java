@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import personal.kcm3394.songcomposerservice.domain.Composer;
-import personal.kcm3394.songcomposerservice.domain.Epoch;
+import personal.kcm3394.songcomposerservice.model.Composer;
+import personal.kcm3394.songcomposerservice.model.Epoch;
 import personal.kcm3394.songcomposerservice.repository.ComposerRepository;
 
 import java.util.Optional;

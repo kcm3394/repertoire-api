@@ -11,12 +11,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import personal.kcm3394.songcomposerservice.domain.Composer;
-import personal.kcm3394.songcomposerservice.domain.Language;
-import personal.kcm3394.songcomposerservice.domain.Song;
-import personal.kcm3394.songcomposerservice.domain.Type;
+import personal.kcm3394.songcomposerservice.model.Composer;
+import personal.kcm3394.songcomposerservice.model.Language;
+import personal.kcm3394.songcomposerservice.model.Song;
+import personal.kcm3394.songcomposerservice.model.Type;
 import personal.kcm3394.songcomposerservice.service.ComposerService;
 import personal.kcm3394.songcomposerservice.service.SongService;
 
