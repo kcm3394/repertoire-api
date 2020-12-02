@@ -6,10 +6,12 @@ import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -39,4 +41,17 @@ public class Song {
     private Type type;
 
     //TODO implement better equals method so cannot re-add same song as different object
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Song song = (Song) o;
+        return title.equals(song.title) &&
+                composer.equals(song.composer);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, composer);
+    }
 }

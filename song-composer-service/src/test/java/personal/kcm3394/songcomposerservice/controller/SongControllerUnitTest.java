@@ -1,5 +1,6 @@
 package personal.kcm3394.songcomposerservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import personal.kcm3394.songcomposerservice.model.Composer;
 import personal.kcm3394.songcomposerservice.model.Language;
 import personal.kcm3394.songcomposerservice.model.Song;
 import personal.kcm3394.songcomposerservice.model.Type;
+import personal.kcm3394.songcomposerservice.model.dtos.ComposerDto;
+import personal.kcm3394.songcomposerservice.model.dtos.SongDto;
 import personal.kcm3394.songcomposerservice.service.ComposerService;
 import personal.kcm3394.songcomposerservice.service.SongService;
 
@@ -23,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,6 +74,116 @@ public class SongControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Dove sono i bei momenti"))
                 .andExpect(jsonPath("$.composer.name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    void should_return_400_when_adding_song_without_composer() throws Exception {
+        SongDto dto = new SongDto();
+        dto.setTitle("Song");
+        when(composerService.findComposerById(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/api/v2/songs/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_400_when_adding_or_updating_song_without_composer_id() throws Exception {
+        SongDto dto = new SongDto();
+        dto.setTitle("Song");
+        ComposerDto composerDto = new ComposerDto();
+        dto.setComposer(composerDto);
+        when(composerService.findComposerById(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/api/v2/songs/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_400_when_adding_same_song() throws Exception {
+        when(songService.findSongByTitleAndComposer(anyString(), anyLong())).thenReturn(buildDoveSono());
+        when(composerService.findComposerById(1L)).thenReturn(Optional.of(buildMozart()));
+
+        mockMvc.perform(post("/api/v2/songs/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildDoveSono()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_updated_song() throws Exception {
+        Song updated = buildDoveSono();
+        updated.setLanguage(Language.ENGLISH);
+        when(songService.findSongById(anyLong())).thenReturn(Optional.of(buildDoveSono()));
+        when(composerService.findComposerById(1L)).thenReturn(Optional.of(buildMozart()));
+        when(songService.saveSong(any(Song.class))).thenReturn(updated);
+
+        mockMvc.perform(put("/api/v2/songs/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updated))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.title").value("Dove sono i bei momenti"))
+                .andExpect(jsonPath("$.language").value("ENGLISH"));
+    }
+
+    @Test
+    void should_return_400_when_updating_song_without_song_id() throws Exception {
+        SongDto dto = new SongDto();
+        dto.setTitle("Song");
+
+        mockMvc.perform(put("/api/v2/songs/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_400_when_updating_song_without_composer_id() throws Exception {
+        SongDto dto = new SongDto();
+        dto.setId(1L);
+        dto.setTitle("Song");
+        ComposerDto composerDto = new ComposerDto();
+        dto.setComposer(composerDto);
+        when(composerService.findComposerById(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/v2/songs/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_404_when_updating_song_with_nonexisting_composer_id() throws Exception {
+        when(songService.findSongById(anyLong())).thenReturn(Optional.of(buildDoveSono()));
+        when(composerService.findComposerById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/v2/songs/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildDoveSono()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void should_return_404_when_updating_song_with_nonexisting_song_id() throws Exception {
+        when(songService.findSongById(anyLong())).thenReturn(Optional.empty());
+        when(composerService.findComposerById(anyLong())).thenReturn(Optional.of(buildMozart()));
+
+        mockMvc.perform(put("/api/v2/songs/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildDoveSono()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test

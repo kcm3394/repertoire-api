@@ -35,13 +35,61 @@ public class SongController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<SongDto> addOrUpdateSong(@RequestBody SongDto songDto) {
+    public ResponseEntity<SongDto> addSong(@RequestBody SongDto songDto) {
+        if (songDto.getComposer() == null || songDto.getComposer().getId() == null) {
+            //todo custom error response
+            log.error("Composer id must not be null");
+            return ResponseEntity.badRequest().build();
+        }
+
         if (composerService.findComposerById(songDto.getComposer().getId()).isEmpty()) {
             //todo custom error response
             log.error("Composer not found when adding song: " + songDto.getTitle());
             return ResponseEntity.notFound().build();
         }
-        log.info("Adding/Updating song: " + songDto.getTitle());
+
+        log.info("Trying to add " + songDto.getTitle() + " " + songDto.getComposer().getId());
+        Song similar = songService.findSongByTitleAndComposer(songDto.getTitle(), songDto.getComposer().getId());
+        if (similar != null && songDto.getTitle().equals(similar.getTitle()) && songDto.getComposer().getId().equals(similar.getComposer().getId())) {
+            //todo custom error response
+            log.error("Song with title " + songDto.getTitle() + " and composer " + songDto.getComposer().getId() + " already exists");
+            return ResponseEntity.badRequest().build();
+        }
+
+        log.info("Adding song: " + songDto.getTitle());
+        Song song = convertSongDtoToEntity(songDto);
+        song.setComposer(composerService.findComposerById(songDto.getComposer().getId()).get());
+        return ResponseEntity.ok(convertEntityToSongDto(songService.saveSong(song)));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<SongDto> updateSong(@RequestBody SongDto songDto) {
+        //TODO update song
+        if (songDto.getId() == null) {
+            //todo custom error response
+            log.error("Song id must not be null to update song");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (songDto.getComposer() == null || songDto.getComposer().getId() == null) {
+            //todo custom error response
+            log.error("Composer id must not be null");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (composerService.findComposerById(songDto.getComposer().getId()).isEmpty()) {
+            //todo custom error response
+            log.error("Composer not found when updating song: " + songDto.getTitle());
+            return ResponseEntity.notFound().build();
+        }
+
+        if (songService.findSongById(songDto.getId()).isEmpty()) {
+            //todo custom error response
+            log.error("Song not found with id " + songDto.getId());
+            return ResponseEntity.notFound().build();
+        }
+
+        log.info("Updating song: " + songDto.getTitle());
         Song song = convertSongDtoToEntity(songDto);
         song.setComposer(composerService.findComposerById(songDto.getComposer().getId()).get());
         return ResponseEntity.ok(convertEntityToSongDto(songService.saveSong(song)));

@@ -1,6 +1,7 @@
 package personal.kcm3394.songcomposerservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class SongServiceImpl implements SongService {
 
     private final SongRepository songRepository;
@@ -27,6 +29,11 @@ public class SongServiceImpl implements SongService {
     @Override
     public Optional<Song> findSongById(Long songId) {
         return songRepository.findById(songId);
+    }
+
+    @Override
+    public Song findSongByTitleAndComposer(String title, Long composerId) {
+        return songRepository.findByTitleAndComposerId(title, composerId);
     }
 
     @Override

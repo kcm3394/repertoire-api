@@ -68,9 +68,7 @@ public class UserController {
         user.setFach(createUserRequest.getFach());
 
         log.info("Saving user: " + createUserRequest.getUsername());
-        userService.saveUser(user);
-        UserDto userDto = convertEntityToUserDto(user);
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(convertEntityToUserDto(userService.saveUser(user)));
     }
 
     @PutMapping("/update/{id}")
@@ -93,8 +91,7 @@ public class UserController {
         user.setFach(updateUserRequest.getFach());
 
         log.info("Updating user " + id + " to " + updateUserRequest.getUsername() + " and " + updateUserRequest.getFach().toString());
-        userService.saveUser(user);
-        return ResponseEntity.ok(convertEntityToUserDto(user));
+        return ResponseEntity.ok(convertEntityToUserDto(userService.saveUser(user)));
     }
 
     @DeleteMapping("/delete/{id}")

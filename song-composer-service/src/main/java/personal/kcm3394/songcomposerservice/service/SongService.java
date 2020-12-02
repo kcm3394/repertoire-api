@@ -14,6 +14,8 @@ public interface SongService {
 
     Optional<Song> findSongById(Long songId);
 
+    Song findSongByTitleAndComposer(String title, Long composerId);
+
     Song saveSong(Song song);
 
     void deleteSong(Long songId);

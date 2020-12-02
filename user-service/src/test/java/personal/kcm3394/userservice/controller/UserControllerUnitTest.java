@@ -17,6 +17,7 @@ import personal.kcm3394.userservice.service.UserService;
 
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -86,6 +87,8 @@ public class UserControllerUnitTest {
 
     @Test
     void should_return_created_user() throws Exception {
+        when(userService.saveUser(any(User.class))).thenReturn(buildUser());
+
         mockMvc.perform(post("/api/v2/user/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(buildUserRequest()))
@@ -135,6 +138,10 @@ public class UserControllerUnitTest {
     @Test
     void should_return_updated_user_information() throws Exception {
         when(userService.findUserById(1L)).thenReturn(Optional.of(buildUser()));
+        User updated = buildUser();
+        updated.setUsername("testUser2");
+        updated.setFach(Fach.MEZZO_SOPRANO);
+        when(userService.saveUser(any(User.class))).thenReturn(updated);
 
         mockMvc.perform(put("/api/v2/user/update/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -143,6 +150,29 @@ public class UserControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("testUser2"))
                 .andExpect(jsonPath("$.fach").value("MEZZO_SOPRANO"));
+    }
+
+    @Test
+    void should_return_404_when_updating_nonexisting_user() throws Exception {
+        when(userService.findUserById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/v2/user/update/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildUpdateRequest()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void should_return_400_when_updating_user_with_existing_username()throws Exception {
+        when(userService.findUserById(1L)).thenReturn(Optional.of(buildUser()));
+        when(userService.findUserByUsername(anyString())).thenReturn(buildUser());
+
+        mockMvc.perform(put("/api/v2/user/update/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildUpdateRequest()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

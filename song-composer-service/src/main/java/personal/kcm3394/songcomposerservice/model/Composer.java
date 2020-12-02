@@ -6,12 +6,14 @@ import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -29,6 +31,7 @@ public class Composer {
     private LocalDate deathDate;
 
     @Enumerated(EnumType.STRING)
+    @NotEmpty
     private Epoch epoch;
 
     @OneToMany(
@@ -39,4 +42,5 @@ public class Composer {
     private Set<Song> compositions;
 
     //TODO implement better equals method so cannot re-add same composer as different object
+
 }

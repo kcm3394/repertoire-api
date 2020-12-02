@@ -9,8 +9,13 @@ import personal.kcm3394.songcomposerservice.model.Epoch;
 import personal.kcm3394.songcomposerservice.model.Language;
 import personal.kcm3394.songcomposerservice.model.Song;
 
+import java.util.Optional;
+
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {
+
+    @Query("SELECT s FROM Song s JOIN s.composer c WHERE s.title = :title AND c.id = :composerId")
+    Song findByTitleAndComposerId(String title, Long composerId);
 
     Page<Song> findAllByTitleContainingOrderByTitle(String titleFragment, Pageable pageable);
 
