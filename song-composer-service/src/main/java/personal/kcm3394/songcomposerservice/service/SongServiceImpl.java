@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import personal.kcm3394.songcomposerservice.model.Epoch;
+import personal.kcm3394.songcomposerservice.model.Language;
 import personal.kcm3394.songcomposerservice.model.Song;
 import personal.kcm3394.songcomposerservice.repository.SongRepository;
 
@@ -45,5 +47,25 @@ public class SongServiceImpl implements SongService {
     @Override
     public Page<Song> searchSongsByComposer(String composerName, Pageable pageable) {
         return songRepository.findAllByComposer_NameContains("%" + composerName + "%", pageable);
+    }
+
+    @Override
+    public Page<Song> findAllSongsInRepertoire(Long repId, Pageable pageable) {
+        return songRepository.findAllSongsInRepertoire(repId, pageable);
+    }
+
+    @Override
+    public Page<Song> findAllSongsInRepertoireByLanguage(Long repId, Language language, Pageable pageable) {
+        return songRepository.findAllSongsInRepertoireByLanguage(repId, language, pageable);
+    }
+
+    @Override
+    public Page<Song> findAllSongsInRepertoireByComposer(Long repId, Long composerId, Pageable pageable) {
+        return songRepository.findAllSongsInRepertoireByComposer(repId, composerId, pageable);
+    }
+
+    @Override
+    public Page<Song> findAllSongsInRepertoireByEpoch(Long repId, Epoch epoch, Pageable pageable) {
+        return songRepository.findAllSongsInRepertoireByEpoch(repId, epoch, pageable);
     }
 }

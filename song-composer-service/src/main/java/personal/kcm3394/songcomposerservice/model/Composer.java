@@ -37,4 +37,6 @@ public class Composer {
             orphanRemoval = true)
     @JsonIgnoreProperties("composer")
     private Set<Song> compositions;
+
+    //TODO implement better equals method so cannot re-add same composer as different object
 }

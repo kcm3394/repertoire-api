@@ -37,4 +37,6 @@ public class Song {
 
     @Enumerated(EnumType.STRING)
     private Type type;
+
+    //TODO implement better equals method so cannot re-add same song as different object
 }
