@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.userservice.model.CreateUserRequest;
+import personal.kcm3394.userservice.model.UpdateUserRequest;
 import personal.kcm3394.userservice.model.User;
 import personal.kcm3394.userservice.model.dtos.UserDto;
 import personal.kcm3394.userservice.service.UserService;
@@ -72,6 +73,30 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest) {
+        //todo this should only be allowed by the user of the same id OR user with admin privileges
+        Optional<User> optionalUser = userService.findUserById(id);
+        if (optionalUser.isEmpty()) {
+            //todo custom error response
+            log.error("User by id " + id + " not found");
+            return ResponseEntity.notFound().build();
+        }
+        User user = optionalUser.get();
+
+        if (userService.findUserByUsername(updateUserRequest.getUsername()) != null) {
+            //todo custom error response
+            log.error("Username already exists");
+            return ResponseEntity.badRequest().build();
+        }
+        user.setUsername(updateUserRequest.getUsername());
+        user.setFach(updateUserRequest.getFach());
+
+        log.info("Updating user " + id + " to " + updateUserRequest.getUsername() + " and " + updateUserRequest.getFach().toString());
+        userService.saveUser(user);
+        return ResponseEntity.ok(convertEntityToUserDto(user));
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         //todo this should only be allowed by the user of the same id OR user with admin privileges
@@ -81,6 +106,7 @@ public class UserController {
             log.error("User by id " + id + " not found");
             return ResponseEntity.notFound().build();
         }
+        //todo when delete user should also delete associated repertoire in other service
         log.info("Deleting user with id: " + id);
         userService.deleteUser(id);
         return ResponseEntity.ok().build();

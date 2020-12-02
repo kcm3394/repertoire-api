@@ -8,10 +8,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import personal.kcm3394.userservice.model.CreateUserRequest;
 import personal.kcm3394.userservice.model.Fach;
+import personal.kcm3394.userservice.model.UpdateUserRequest;
 import personal.kcm3394.userservice.model.User;
 import personal.kcm3394.userservice.service.UserService;
 
@@ -133,12 +133,32 @@ public class UserControllerUnitTest {
     }
 
     @Test
+    void should_return_updated_user_information() throws Exception {
+        when(userService.findUserById(1L)).thenReturn(Optional.of(buildUser()));
+
+        mockMvc.perform(put("/api/v2/user/update/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildUpdateRequest()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("testUser2"))
+                .andExpect(jsonPath("$.fach").value("MEZZO_SOPRANO"));
+    }
+
+    @Test
     void should_return_200_when_song_deleted() throws Exception {
         when(userService.findUserById(1L)).thenReturn(Optional.of(buildUser()));
 
         mockMvc.perform(delete("/api/v2/user/delete/1")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    private UpdateUserRequest buildUpdateRequest() {
+        return UpdateUserRequest.builder()
+                .username("testUser2")
+                .fach(Fach.MEZZO_SOPRANO)
+                .build();
     }
 
     private CreateUserRequest buildUserRequest() {
