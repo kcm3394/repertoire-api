@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import personal.kcm3394.songcomposerservice.model.Composer;
 import personal.kcm3394.songcomposerservice.model.Epoch;
+import personal.kcm3394.songcomposerservice.model.dtos.ComposerDto;
 import personal.kcm3394.songcomposerservice.service.ComposerService;
 
 import java.time.LocalDate;
@@ -21,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -57,6 +57,7 @@ public class ComposerControllerUnitTest {
     @Test
     void should_return_created_composer() throws Exception {
         when(composerService.saveComposer(any(Composer.class))).thenReturn(buildMozart());
+        when(composerService.findComposerByNameAndEpoch(anyString(), any(Epoch.class))).thenReturn(null);
 
         mockMvc.perform(post("/api/v2/composers/add")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,6 +66,85 @@ public class ComposerControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.name").value("Wolfgang Amadeus Mozart"));
+    }
+
+    @Test
+    void should_return_400_when_adding_composer_without_name() throws Exception {
+        ComposerDto dto = new ComposerDto();
+
+        mockMvc.perform(post("/api/v2/composers/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_400_when_adding_composer_without_epoch() throws Exception {
+        ComposerDto dto = new ComposerDto();
+        dto.setName("John Smith");
+
+        mockMvc.perform(post("/api/v2/composers/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_400_when_adding_existing_composer() throws Exception {
+        when(composerService.findComposerByNameAndEpoch(anyString(), any(Epoch.class))).thenReturn(buildMozart());
+
+        mockMvc.perform(post("/api/v2/composers/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(buildMozart()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_updated_composer() throws Exception {
+        Composer update = buildMozart();
+        update.setEpoch(Epoch.TWENTY_FIRST_CENTURY);
+        when(composerService.findComposerById(anyLong())).thenReturn(Optional.of(buildMozart()));
+        when(composerService.saveComposer(any(Composer.class))).thenReturn(update);
+
+        mockMvc.perform(put("/api/v2/composers/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(update))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.name").value("Wolfgang Amadeus Mozart"))
+                .andExpect(jsonPath("$.epoch").value("TWENTY_FIRST_CENTURY"));
+    }
+
+    @Test
+    void should_return_400_when_updating_composer_without_id() throws Exception {
+        ComposerDto dto = new ComposerDto();
+        dto.setName("John Smith");
+        dto.setEpoch(Epoch.TWENTY_FIRST_CENTURY);
+
+        mockMvc.perform(put("/api/v2/composers/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void should_return_404_when_updating_composer_with_unassigned_id() throws Exception {
+        ComposerDto dto = new ComposerDto();
+        dto.setId(5L);
+        dto.setName("John Smith");
+        dto.setEpoch(Epoch.TWENTY_FIRST_CENTURY);
+        when(composerService.findComposerById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(put("/api/v2/composers/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -106,7 +186,7 @@ public class ComposerControllerUnitTest {
         ArrayList<Composer> justMozart = new ArrayList<>();
         justMozart.add(buildMozart());
         PageImpl<Composer> justMozartPage = new PageImpl<>(justMozart, pageable, justMozart.size());
-        when(composerService.searchComposersByEpoch(anyString(), any(Pageable.class))).thenReturn(justMozartPage);
+        when(composerService.searchComposersByEpoch(any(Epoch.class), any(Pageable.class))).thenReturn(justMozartPage);
 
         mockMvc.perform(get("/api/v2/composers/search/epoch/classical")
                 .accept(MediaType.APPLICATION_JSON))

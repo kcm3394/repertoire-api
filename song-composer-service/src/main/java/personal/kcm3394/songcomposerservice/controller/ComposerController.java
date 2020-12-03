@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import personal.kcm3394.songcomposerservice.model.Composer;
+import personal.kcm3394.songcomposerservice.model.Epoch;
 import personal.kcm3394.songcomposerservice.model.dtos.ComposerDto;
 import personal.kcm3394.songcomposerservice.service.ComposerService;
 
@@ -32,10 +33,60 @@ public class ComposerController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ComposerDto> addOrUpdateComposer(@RequestBody ComposerDto composerDto) {
-        log.info("Adding/Updating composer: " + composerDto.getName());
+    public ResponseEntity<ComposerDto> addComposer(@RequestBody ComposerDto composerDto) {
+        if (composerDto.getName() == null) {
+            //TODO custom error response
+            log.error("Composer name must not be null");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (composerDto.getEpoch() == null) {
+            //TODO custom error response
+            log.error("Epoch must not be null");
+            return ResponseEntity.badRequest().build();
+        }
+
+        log.info("Trying to add " + composerDto.getName());
+        Composer similar = composerService.findComposerByNameAndEpoch(composerDto.getName(), composerDto.getEpoch());
+        if (similar != null && composerDto.getName().equals(similar.getName()) && composerDto.getEpoch().equals(similar.getEpoch())) {
+            //TODO custom error response
+            log.error("Composer with name " + composerDto.getName() + " and epoch " + composerDto.getEpoch().toString() + " already exists");
+            return ResponseEntity.badRequest().build();
+        }
+
+        log.info("Adding composer: " + composerDto.getName());
         Composer composer = composerService.saveComposer(convertComposerDtoToEntity(composerDto));
         return ResponseEntity.ok(convertEntityToComposerDto(composer));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ComposerDto> updateComposer(@RequestBody ComposerDto composerDto) {
+        if (composerDto.getId() == null) {
+            //TODO custom error response
+            log.error("Composer id must not be null to update composer");
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<Composer> optionalComposer = composerService.findComposerById(composerDto.getId());
+        if (optionalComposer.isEmpty()) {
+            //TODO custom error response
+            log.error("Composer not found with id: " + composerDto.getId());
+            return ResponseEntity.notFound().build();
+        }
+        Composer composer = optionalComposer.get();
+
+        log.info("Updating composer: " + composerDto.getName());
+        composer.setName(composerDto.getName());
+        if (composerDto.getBirthDate() != null) {
+            composer.setBirthDate(composerDto.getBirthDate());
+        }
+        if (composerDto.getDeathDate() != null) {
+            composer.setDeathDate(composerDto.getDeathDate());
+        }
+        composer.setEpoch(composerDto.getEpoch());
+
+        Composer updated = composerService.saveComposer(composer);
+        return ResponseEntity.ok(convertEntityToComposerDto(updated));
     }
 
     @DeleteMapping("/delete/{id}")
@@ -59,7 +110,7 @@ public class ComposerController {
     }
 
     @GetMapping("/search/epoch/{epoch}")
-    public ResponseEntity<Page<ComposerDto>> searchComposersByEpoch(@PathVariable String epoch, Pageable pageable) {
+    public ResponseEntity<Page<ComposerDto>> searchComposersByEpoch(@PathVariable Epoch epoch, Pageable pageable) {
         log.info("Searching for composers from epoch: " + epoch);
         Page<Composer> composers = composerService.searchComposersByEpoch(epoch, pageable);
         return ResponseEntity.ok(convertPageOfEntitiesToPageImplOfCompDtos(composers, pageable));

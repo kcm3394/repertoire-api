@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import personal.kcm3394.songcomposerservice.model.Composer;
 import personal.kcm3394.songcomposerservice.model.Song;
 import personal.kcm3394.songcomposerservice.model.dtos.ComposerDto;
 import personal.kcm3394.songcomposerservice.model.dtos.SongDto;
@@ -50,9 +51,12 @@ public class SongController {
 
         log.info("Trying to add " + songDto.getTitle() + " " + songDto.getComposer().getId());
         Song similar = songService.findSongByTitleAndComposer(songDto.getTitle(), songDto.getComposer().getId());
-        if (similar != null && songDto.getTitle().equals(similar.getTitle()) && songDto.getComposer().getId().equals(similar.getComposer().getId())) {
+        if (similar != null &&
+                songDto.getTitle().equals(similar.getTitle()) &&
+                songDto.getComposer().getId().equals(similar.getComposer().getId()) &&
+                songDto.getLanguage().toString().equals(similar.getLanguage().toString())) {
             //todo custom error response
-            log.error("Song with title " + songDto.getTitle() + " and composer " + songDto.getComposer().getId() + " already exists");
+            log.error("Song with title " + songDto.getTitle() + " and composer " + songDto.getComposer().getId() + " in " + songDto.getLanguage().toString() + " language already exists");
             return ResponseEntity.badRequest().build();
         }
 
@@ -64,7 +68,6 @@ public class SongController {
 
     @PutMapping("/update")
     public ResponseEntity<SongDto> updateSong(@RequestBody SongDto songDto) {
-        //TODO update song
         if (songDto.getId() == null) {
             //todo custom error response
             log.error("Song id must not be null to update song");
@@ -77,22 +80,38 @@ public class SongController {
             return ResponseEntity.badRequest().build();
         }
 
-        if (composerService.findComposerById(songDto.getComposer().getId()).isEmpty()) {
+        Optional<Composer> optionalComposer = composerService.findComposerById(songDto.getComposer().getId());
+        if (optionalComposer.isEmpty()) {
             //todo custom error response
             log.error("Composer not found when updating song: " + songDto.getTitle());
             return ResponseEntity.notFound().build();
         }
+        Composer composer = optionalComposer.get();
 
-        if (songService.findSongById(songDto.getId()).isEmpty()) {
+        Optional<Song> optionalSong = songService.findSongById(songDto.getId());
+        if (optionalSong.isEmpty()) {
             //todo custom error response
             log.error("Song not found with id " + songDto.getId());
             return ResponseEntity.notFound().build();
         }
+        Song song = optionalSong.get();
 
         log.info("Updating song: " + songDto.getTitle());
-        Song song = convertSongDtoToEntity(songDto);
-        song.setComposer(composerService.findComposerById(songDto.getComposer().getId()).get());
-        return ResponseEntity.ok(convertEntityToSongDto(songService.saveSong(song)));
+        song.setTitle(songDto.getTitle());
+        song.setComposer(composer);
+        if (songDto.getContainingWork() != null) {
+            song.setContainingWork(songDto.getContainingWork());
+        }
+        if (songDto.getDuration() != null) {
+            song.setDuration(songDto.getDuration());
+        }
+        song.setLanguage(songDto.getLanguage());
+        if (songDto.getType() != null) {
+            song.setType(songDto.getType());
+        }
+
+        Song updated = songService.saveSong(song);
+        return ResponseEntity.ok(convertEntityToSongDto(updated));
     }
 
     @DeleteMapping("/delete/{id}")

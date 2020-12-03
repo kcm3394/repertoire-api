@@ -11,6 +11,8 @@ import personal.kcm3394.songcomposerservice.model.Epoch;
 @Repository
 public interface ComposerRepository extends JpaRepository<Composer, Long> {
 
+    Composer findByNameAndEpoch(String name, Epoch epoch);
+
     Page<Composer> findAllByNameContainingOrderByName(String nameFragment, Pageable pageable);
 
     Page<Composer> findAllByEpochOrderByName(Epoch epoch, Pageable pageable);

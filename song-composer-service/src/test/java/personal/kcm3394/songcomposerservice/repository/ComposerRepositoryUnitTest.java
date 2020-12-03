@@ -103,6 +103,14 @@ public class ComposerRepositoryUnitTest {
     }
 
     @Test
+    void should_return_composer_by_name_and_epoch() {
+        Composer composer = composerRepository.findByNameAndEpoch("Robert Schumann", Epoch.ROMANTIC);
+
+        assertNotNull(composer);
+        assertThat(composer, equalTo(c1));
+    }
+
+    @Test
     void should_return_composers_by_name_fragment_in_alphabetical_order() {
         Page<Composer> page = composerRepository.findAllByNameContainingOrderByName("Schu", pageable);
 

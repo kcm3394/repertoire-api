@@ -29,6 +29,11 @@ public class ComposerServiceImpl implements ComposerService {
     }
 
     @Override
+    public Composer findComposerByNameAndEpoch(String name, Epoch epoch) {
+        return composerRepository.findByNameAndEpoch(name, epoch);
+    }
+
+    @Override
     public Composer saveComposer(Composer composer) {
         return composerRepository.save(composer);
     }
@@ -44,8 +49,8 @@ public class ComposerServiceImpl implements ComposerService {
     }
 
     @Override
-    public Page<Composer> searchComposersByEpoch(String epoch, Pageable pageable) {
-        return composerRepository.findAllByEpochOrderByName(Epoch.valueOf(epoch.toUpperCase()), pageable);
+    public Page<Composer> searchComposersByEpoch(Epoch epoch, Pageable pageable) {
+        return composerRepository.findAllByEpochOrderByName(epoch, pageable);
     }
 
     @Override

@@ -81,6 +81,7 @@ public class SongControllerUnitTest {
         SongDto dto = new SongDto();
         dto.setTitle("Song");
         when(composerService.findComposerById(any())).thenReturn(Optional.empty());
+        when(songService.findSongByTitleAndComposer(anyString(), anyLong())).thenReturn(null);
 
         mockMvc.perform(post("/api/v2/songs/add")
                 .contentType(MediaType.APPLICATION_JSON)

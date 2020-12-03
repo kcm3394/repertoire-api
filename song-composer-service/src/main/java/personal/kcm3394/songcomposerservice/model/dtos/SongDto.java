@@ -22,6 +22,9 @@ public class SongDto {
 
     private String containingWork;
     private String duration;
+
+    @NotNull(message = "Song must be assigned a language")
     private Language language;
+
     private Type type;
 }

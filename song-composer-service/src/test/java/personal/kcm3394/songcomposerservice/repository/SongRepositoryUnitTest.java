@@ -8,12 +8,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import personal.kcm3394.songcomposerservice.model.Composer;
-import personal.kcm3394.songcomposerservice.model.Epoch;
-import personal.kcm3394.songcomposerservice.model.Language;
-import personal.kcm3394.songcomposerservice.model.Song;
+import personal.kcm3394.songcomposerservice.model.*;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -32,6 +31,8 @@ public class SongRepositoryUnitTest {
     private Song s1;
     private Song s2;
     private Composer c1;
+    private Composer c2;
+    private Repertoire rep;
     private final Pageable pageable = PageRequest.of(0, 5);
 
     @BeforeEach
@@ -55,7 +56,7 @@ public class SongRepositoryUnitTest {
                 .language(Language.ITALIAN)
                 .build();
 
-        Composer c2 = Composer.builder()
+        c2 = Composer.builder()
                 .name("comp2")
                 .epoch(Epoch.ROMANTIC)
                 .build();
@@ -71,6 +72,17 @@ public class SongRepositoryUnitTest {
 
         s3.setComposer(c2);
         testEntityManager.persist(s3);
+
+        Set<Song> songs = new HashSet<>();
+        songs.add(s1);
+        songs.add(s2);
+        songs.add(s3);
+
+        rep = Repertoire.builder()
+                .userId(1L)
+                .repertoire(songs)
+                .build();
+        testEntityManager.persistAndFlush(rep);
     }
 
     @Test
@@ -86,6 +98,7 @@ public class SongRepositoryUnitTest {
         Song toSave = new Song();
         toSave.setTitle("saved");
         toSave.setComposer(c1);
+        toSave.setLanguage(Language.ENGLISH);
 
         Song saved = songRepository.save(toSave);
 
@@ -123,6 +136,13 @@ public class SongRepositoryUnitTest {
     }
 
     @Test
+    void should_return_song_by_title_and_composer_id() {
+        Song song = songRepository.findByTitleAndComposerId(s1.getTitle(), s1.getComposer().getId());
+
+        assertThat(song, equalTo(s1));
+    }
+
+    @Test
     void should_return_page_of_songs_by_title_fragment() {
         Page<Song> page = songRepository.findAllByTitleContainingOrderByTitle("son", pageable);
 
@@ -135,6 +155,38 @@ public class SongRepositoryUnitTest {
         Page<Song> page = songRepository.findAllByComposer_NameContains("%comp%", pageable);
 
         assertThat(page.getNumberOfElements(), is(3));
+        assertThat(page.getContent().get(0).getTitle(), is("different3"));
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_in_alphabetical_order() {
+        Page<Song> page = songRepository.findAllSongsInRepertoire(rep.getId(), pageable);
+
+        assertThat(page.getNumberOfElements(), is(3));
+        assertThat(page.getContent().get(0).getTitle(), is("different3"));
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_by_language_in_alphabetical_order() {
+        Page<Song> page = songRepository.findAllSongsInRepertoireByLanguage(rep.getId(), Language.ITALIAN, pageable);
+
+        assertThat(page.getNumberOfElements(), is(2));
+        assertThat(page.getContent().get(0).getTitle(), is("different3"));
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_by_composer_in_alphabetical_order() {
+        Page<Song> page = songRepository.findAllSongsInRepertoireByComposer(rep.getId(), c2.getId(), pageable);
+
+        assertThat(page.getNumberOfElements(), is(2));
+        assertThat(page.getContent().get(0).getTitle(), is("different3"));
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_by_epoch_in_alphabetical_order() {
+        Page<Song> page = songRepository.findAllSongsInRepertoireByEpoch(rep.getId(), Epoch.ROMANTIC, pageable);
+
+        assertThat(page.getNumberOfElements(), is(2));
         assertThat(page.getContent().get(0).getTitle(), is("different3"));
     }
 }

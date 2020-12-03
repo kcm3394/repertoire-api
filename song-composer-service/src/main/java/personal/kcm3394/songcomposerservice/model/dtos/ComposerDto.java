@@ -5,6 +5,7 @@ import lombok.Setter;
 import personal.kcm3394.songcomposerservice.model.Epoch;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Getter
@@ -18,5 +19,7 @@ public class ComposerDto {
 
     private LocalDate birthDate;
     private LocalDate deathDate;
+
+    @NotNull(message = "Composer must be assigned an epoch")
     private Epoch epoch;
 }

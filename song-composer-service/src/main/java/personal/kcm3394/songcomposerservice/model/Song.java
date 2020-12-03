@@ -1,11 +1,11 @@
 package personal.kcm3394.songcomposerservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -35,23 +35,25 @@ public class Song {
     private String duration;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Language language;
 
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    //TODO implement better equals method so cannot re-add same song as different object
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Song song = (Song) o;
-        return title.equals(song.title) &&
-                composer.equals(song.composer);
+        return id.equals(song.id) &&
+                title.equals(song.title) &&
+                composer.equals(song.composer) &&
+                language == song.language;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, composer);
+        return Objects.hash(id, title, composer, language);
     }
 }

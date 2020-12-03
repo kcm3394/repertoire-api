@@ -77,6 +77,18 @@ public class ComposerServiceUnitTest {
     }
 
     @Test
+    void should_return_composer_by_name_and_epoch() {
+        when(composerService.findComposerByNameAndEpoch(anyString(), any(Epoch.class))).thenReturn(buildMozart());
+
+        Composer composer = composerService.findComposerByNameAndEpoch("Wolfgang Amadeus Mozart", Epoch.CLASSICAL);
+
+        assertNotNull(composer);
+        assertEquals("Wolfgang Amadeus Mozart", composer.getName());
+        assertEquals(Epoch.CLASSICAL, composer.getEpoch());
+        assertEquals(1L, composer.getId());
+    }
+
+    @Test
     void should_return_page_of_composers_by_name() {
         Pageable pageable = PageRequest.of(0, 5);
         when(composerRepository.findAllByNameContainingOrderByName(anyString(), any(Pageable.class))).thenReturn(getAllComposers());
@@ -93,7 +105,7 @@ public class ComposerServiceUnitTest {
         Pageable pageable = PageRequest.of(0, 5);
         when(composerRepository.findAllByEpochOrderByName(any(Epoch.class), any(Pageable.class))).thenReturn(getAllComposers());
 
-        Page<Composer> page = composerService.searchComposersByEpoch("classical", pageable);
+        Page<Composer> page = composerService.searchComposersByEpoch(Epoch.CLASSICAL, pageable);
 
         assertNotNull(page);
         assertEquals(2, page.getNumberOfElements());

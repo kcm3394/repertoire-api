@@ -22,15 +22,15 @@ public interface SongRepository extends JpaRepository<Song, Long> {
     @Query("SELECT s FROM Song s JOIN s.composer c WHERE c.name LIKE :pattern ORDER BY s.title ASC")
     Page<Song> findAllByComposer_NameContains(String pattern, Pageable pageable);
 
-    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId")
+    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId ORDER BY s.title ASC")
     Page<Song> findAllSongsInRepertoire(Long repId, Pageable pageable);
 
-    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId AND s.language = :language")
+    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId AND s.language = :language ORDER BY s.title ASC")
     Page<Song> findAllSongsInRepertoireByLanguage(Long repId, Language language, Pageable pageable);
 
-    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId AND s.composer.id = :composerId")
+    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId AND s.composer.id = :composerId ORDER BY s.title ASC")
     Page<Song> findAllSongsInRepertoireByComposer(Long repId, Long composerId, Pageable pageable);
 
-    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId AND s.composer.epoch = :epoch")
+    @Query("SELECT s FROM Repertoire r JOIN r.repertoire s WHERE r.id = :repId AND s.composer.epoch = :epoch ORDER BY s.title ASC")
     Page<Song> findAllSongsInRepertoireByEpoch(Long repId, Epoch epoch, Pageable pageable);
 }

@@ -1,13 +1,13 @@
 package personal.kcm3394.songcomposerservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -31,7 +31,7 @@ public class Composer {
     private LocalDate deathDate;
 
     @Enumerated(EnumType.STRING)
-    @NotEmpty
+    @NotNull
     private Epoch epoch;
 
     @OneToMany(
@@ -41,6 +41,18 @@ public class Composer {
     @JsonIgnoreProperties("composer")
     private Set<Song> compositions;
 
-    //TODO implement better equals method so cannot re-add same composer as different object
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Composer composer = (Composer) o;
+        return id.equals(composer.id) &&
+                name.equals(composer.name) &&
+                epoch == composer.epoch;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, epoch);
+    }
 }

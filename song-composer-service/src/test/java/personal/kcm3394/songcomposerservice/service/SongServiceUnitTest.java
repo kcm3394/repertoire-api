@@ -9,10 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import personal.kcm3394.songcomposerservice.model.Composer;
-import personal.kcm3394.songcomposerservice.model.Language;
-import personal.kcm3394.songcomposerservice.model.Song;
-import personal.kcm3394.songcomposerservice.model.Type;
+import personal.kcm3394.songcomposerservice.model.*;
 import personal.kcm3394.songcomposerservice.repository.SongRepository;
 
 import java.util.ArrayList;
@@ -34,9 +31,10 @@ public class SongServiceUnitTest {
     @InjectMocks
     private SongServiceImpl songService;
 
+    private final Pageable pageable = PageRequest.of(0, 5);
+
     @Test
     void should_return_page_of_songs() {
-        Pageable pageable = PageRequest.of(0, 5);
         when(songRepository.findAll(any(Pageable.class))).thenReturn(getAllSongs());
 
         Page<Song> page = songService.getAllSongs(pageable);
@@ -55,6 +53,18 @@ public class SongServiceUnitTest {
 
         verify(songRepository, times(1)).findById(anyLong());
         assertTrue(songService.findSongById(1L).isPresent());
+        assertEquals("Dove sono i bei momenti", song.getTitle());
+        assertEquals("Wolfgang Amadeus Mozart", song.getComposer().getName());
+    }
+
+    @Test
+    void should_return_song_by_title_and_composer() {
+        when(songRepository.findByTitleAndComposerId(anyString(), anyLong())).thenReturn(buildDoveSono());
+
+        Song song = songService.findSongByTitleAndComposer("Dove sono i bei momenti", 1L);
+
+        verify(songRepository, times(1)).findByTitleAndComposerId(anyString(), anyLong());
+        assertNotNull(song);
         assertEquals("Dove sono i bei momenti", song.getTitle());
         assertEquals("Wolfgang Amadeus Mozart", song.getComposer().getName());
     }
@@ -79,7 +89,6 @@ public class SongServiceUnitTest {
 
     @Test
     void should_return_page_of_songs_by_title() {
-        Pageable pageable = PageRequest.of(0, 5);
         when(songRepository.findAllByTitleContainingOrderByTitle(anyString(), any(Pageable.class))).thenReturn(getAllSongs());
 
         Page<Song> page = songService.searchSongsByTitle("dov", pageable);
@@ -92,7 +101,6 @@ public class SongServiceUnitTest {
 
     @Test
     void should_return_page_of_songs_by_composer() {
-        Pageable pageable = PageRequest.of(0, 5);
         when(songRepository.findAllByComposer_NameContains(anyString(), any(Pageable.class))).thenReturn(getAllSongs());
 
         Page<Song> page = songService.searchSongsByComposer("moz", pageable);
@@ -103,10 +111,59 @@ public class SongServiceUnitTest {
         assertEquals(1L, page.getContent().get(0).getId());
     }
 
+    @Test
+    void should_return_page_of_songs_in_user_rep() {
+        when(songRepository.findAllSongsInRepertoire(anyLong(), any(Pageable.class))).thenReturn(getAllSongs());
+
+        Page<Song> page = songService.findAllSongsInRepertoire(1L, pageable);
+
+        verify(songRepository, times(1)).findAllSongsInRepertoire(anyLong(), any(Pageable.class));
+        assertNotNull(page);
+        assertEquals(2, page.getNumberOfElements());
+        assertEquals(1L, page.getContent().get(0).getId());
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_by_language() {
+        when(songRepository.findAllSongsInRepertoireByLanguage(anyLong(), any(Language.class), any(Pageable.class))).thenReturn(getAllSongs());
+
+        Page<Song> page = songService.findAllSongsInRepertoireByLanguage(1L, Language.ITALIAN, pageable);
+
+        verify(songRepository, times(1)).findAllSongsInRepertoireByLanguage(anyLong(), any(Language.class), any(Pageable.class));
+        assertNotNull(page);
+        assertEquals(2, page.getNumberOfElements());
+        assertEquals(1L, page.getContent().get(0).getId());
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_by_composer() {
+        when(songRepository.findAllSongsInRepertoireByComposer(anyLong(), anyLong(), any(Pageable.class))).thenReturn(getAllSongs());
+
+        Page<Song> page = songService.findAllSongsInRepertoireByComposer(1L, 1L, pageable);
+
+        verify(songRepository, times(1)).findAllSongsInRepertoireByComposer(anyLong(), anyLong(), any(Pageable.class));
+        assertNotNull(page);
+        assertEquals(2, page.getNumberOfElements());
+        assertEquals(1L, page.getContent().get(0).getId());
+    }
+
+    @Test
+    void should_return_page_of_songs_in_user_rep_by_epoch() {
+        when(songRepository.findAllSongsInRepertoireByEpoch(anyLong(), any(Epoch.class), any(Pageable.class))).thenReturn(getAllSongs());
+
+        Page<Song> page = songService.findAllSongsInRepertoireByEpoch(1L, Epoch.CLASSICAL, pageable);
+
+        verify(songRepository, times(1)).findAllSongsInRepertoireByEpoch(anyLong(), any(Epoch.class), any(Pageable.class));
+        assertNotNull(page);
+        assertEquals(2, page.getNumberOfElements());
+        assertEquals(1L, page.getContent().get(0).getId());
+    }
+
     private Composer buildMozart() {
         return Composer.builder()
                 .id(1L)
                 .name("Wolfgang Amadeus Mozart")
+                .epoch(Epoch.CLASSICAL)
                 .build();
     }
 
@@ -126,6 +183,7 @@ public class SongServiceUnitTest {
         Composer puccini = Composer.builder()
                 .id(2L)
                 .name("Giacomo Puccini")
+                .epoch(Epoch.LATE_ROMANTIC)
                 .build();
 
         return Song.builder()

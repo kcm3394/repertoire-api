@@ -195,27 +195,25 @@ public class RepertoireControllerUnitTest {
                 .andExpect(status().isNotFound());
     }
 
-    //TODO test for equals method so can check if repertoire has song or not, then test
+    @Test
+    void should_return_400_when_adding_song_already_in_repertoire() throws Exception {
+        when(songService.findSongById(anyLong())).thenReturn(Optional.of(buildDoveSono()));
+        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
 
-//    @Test
-//    void should_return_400_when_adding_song_already_in_repertoire() throws Exception {
-//        when(songService.findSongById(anyLong())).thenReturn(Optional.of(buildDoveSono()));
-//        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
-//
-//        mockMvc.perform(post("/api/v2/repertoire/2/add-song/1")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
+        mockMvc.perform(post("/api/v2/repertoire/2/add-song/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
-//    @Test
-//    void should_delete_song_from_repertoire() throws Exception {
-//        when(songService.findSongById(anyLong())).thenReturn(Optional.of(buildDoveSono()));
-//        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
-//
-//        mockMvc.perform(delete("/api/v2/repertoire/2/delete-song/1")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
-//    }
+    @Test
+    void should_delete_song_from_repertoire() throws Exception {
+        when(songService.findSongById(anyLong())).thenReturn(Optional.of(buildDoveSono()));
+        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
+
+        mockMvc.perform(delete("/api/v2/repertoire/2/delete-song/1")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void should_return_400_when_deleting_song_not_in_repertoire() throws Exception {
