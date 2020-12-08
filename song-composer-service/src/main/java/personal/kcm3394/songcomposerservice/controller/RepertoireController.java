@@ -43,40 +43,6 @@ public class RepertoireController {
         return ResponseEntity.ok(convertEntityToRepertoireDto(optionalRepertoire.get()));
     }
 
-    @PutMapping("/{userId}/create-repertoire")
-    public ResponseEntity<Void> createRepertoireForNewUser(@PathVariable Long userId) {
-        //todo have this happen through event listener - user creation sends event and this service creates this, admin only
-        Repertoire repertoire = repertoireService.findRepertoireByUserId(userId);
-        if (repertoire != null) {
-            //todo custom error response
-            log.error("Repertoire for user " + userId + " already exists");
-            return ResponseEntity.badRequest().build();
-        }
-
-        log.info("Creating empty repertoire for user " + userId);
-        Repertoire newRepertoire = Repertoire.builder()
-                .userId(userId)
-                .repertoire(new HashSet<>())
-                .build();
-        repertoireService.saveRepertoire(newRepertoire);
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{userId}/delete-repertoire")
-    public ResponseEntity<Void> deleteRepertoireForDeletedUser(@PathVariable Long userId) {
-        //todo have this happen through event listener - user deletion sends event and this service deletes it, admin only
-        Repertoire repertoire = repertoireService.findRepertoireByUserId(userId);
-        if (repertoire == null) {
-            //todo custom error response
-            log.error("Repertoire for user " + userId + " does not exist");
-            return ResponseEntity.badRequest().build();
-        }
-
-        log.info("Deleting repertoire for user " + userId);
-        repertoireService.deleteRepertoire(repertoire.getId());
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<Page<SongDto>> getUserRepertoire(@PathVariable Long userId, Pageable pageable) {
         Repertoire repertoire = repertoireService.findRepertoireByUserId(userId);

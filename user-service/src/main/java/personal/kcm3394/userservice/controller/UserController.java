@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import personal.kcm3394.userservice.config.JmsConfig;
 import personal.kcm3394.userservice.model.CreateUserRequest;
 import personal.kcm3394.userservice.model.UpdateUserRequest;
 import personal.kcm3394.userservice.model.User;
 import personal.kcm3394.userservice.model.dtos.UserDto;
+import personal.kcm3394.repertoire.common.model.CreateUserEvent;
+import personal.kcm3394.repertoire.common.model.DeleteUserEvent;
 import personal.kcm3394.userservice.service.UserService;
 
 import java.util.Optional;
@@ -22,6 +26,7 @@ public class UserController {
 
     private final UserService userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JmsTemplate jmsTemplate;
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> findUserById(@PathVariable Long id) {
@@ -68,7 +73,14 @@ public class UserController {
         user.setFach(createUserRequest.getFach());
 
         log.info("Saving user: " + createUserRequest.getUsername());
-        return ResponseEntity.ok(convertEntityToUserDto(userService.saveUser(user)));
+        User saved = userService.saveUser(user);
+
+        log.info("Sending transaction to JMS Queue for user " + saved.getId());
+        CreateUserEvent event = CreateUserEvent.builder()
+                .userId(saved.getId())
+                .build();
+        jmsTemplate.convertAndSend(JmsConfig.USER_CREATION_QUEUE, event);
+        return ResponseEntity.ok(convertEntityToUserDto(saved));
     }
 
     @PutMapping("/update/{id}")
@@ -103,9 +115,15 @@ public class UserController {
             log.error("User by id " + id + " not found");
             return ResponseEntity.notFound().build();
         }
-        //todo when delete user should also delete associated repertoire in other service
+
         log.info("Deleting user with id: " + id);
         userService.deleteUser(id);
+
+        log.info("Sending transaction to JMS Queue for user " + id);
+        DeleteUserEvent event = DeleteUserEvent.builder()
+                .userId(id)
+                .build();
+        jmsTemplate.convertAndSend(JmsConfig.USER_DELETION_QUEUE, event);
         return ResponseEntity.ok().build();
     }
 

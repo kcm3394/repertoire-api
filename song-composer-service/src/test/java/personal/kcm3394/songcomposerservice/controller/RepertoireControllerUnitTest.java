@@ -63,42 +63,6 @@ public class RepertoireControllerUnitTest {
     }
 
     @Test
-    void should_return_200_when_creating_repertoire_for_new_user() throws Exception {
-        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(null);
-
-        mockMvc.perform(put("/api/v2/repertoire/2/create-repertoire")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void should_return_400_when_creating_repertoire_for_existing_user() throws Exception {
-        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
-
-        mockMvc.perform(put("/api/v2/repertoire/2/create-repertoire")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void should_delete_repertoire_for_deleted_user() throws Exception {
-        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
-
-        mockMvc.perform(delete("/api/v2/repertoire/2/delete-repertoire")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void should_return_400_when_deleting_repertoire_for_user_without_repertoire() throws Exception {
-        when(repertoireService.findRepertoireByUserId(2L)).thenReturn(null);
-
-        mockMvc.perform(delete("/api/v2/repertoire/2/delete-repertoire")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void should_return_repertoire_by_user_id() throws Exception {
         when(repertoireService.findRepertoireByUserId(2L)).thenReturn(buildRepertoire());
         when(songService.findAllSongsInRepertoire(anyLong(), any(Pageable.class))).thenReturn(getAllSongs());
